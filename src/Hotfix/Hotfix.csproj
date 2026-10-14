@@ -9,12 +9,16 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>hotfix.ico</ApplicationIcon>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Product>Hotfix</Product>
     <Company>Den Frie Vilje ApS</Company>
     <Copyright>© 2026 Den Frie Vilje ApS</Copyright>
     <Description>Warms the room with CPU and GPU time nothing else wants</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="AnswerCheck" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ComputeSharp" Version="3.2.0" />

@@ -3,6 +3,7 @@
     <Project Path="src/Hotfix/Hotfix.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/AnswerCheck/AnswerCheck.csproj" />
     <Project Path="tests/YieldCheck/YieldCheck.csproj" />
   </Folder>
 </Solution>

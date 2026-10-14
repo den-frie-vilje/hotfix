@@ -404,6 +404,58 @@
   .chat .acts button { box-shadow: inset 0 0 0 1px #8a8a8a; }
   .chat:popover-open { animation: open .2s var(--ease); }
 
+
+  /* research, after the Microsoft Research blog: a white reading column, area chips, "At a glance", numbered figures */
+  .research { background: #fff; color: var(--ink); }
+  .rwrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+  .rlabel { font-size: 14px; font-weight: 600; color: #5c2d91; }
+  .rlabel a { color: inherit; text-decoration: none; }
+  .research h2 { font: 600 clamp(34px, 4.6vw, 52px)/1.08 var(--display); letter-spacing: -.03em; margin-top: 12px; }
+  .dek { font-size: 20px; color: #505050; margin-top: 16px; }
+  .byline { display: flex; align-items: center; gap: 12px; margin-top: 26px; font-size: 14px; }
+  .byline .av { width: 44px; height: 44px; border-radius: 50%; background: #1b1b1b; display: grid; place-items: center; flex: none; }
+  .byline .av svg { width: 22px; height: 22px; }
+  .byline b { display: block; font-weight: 600; }
+  .byline span { color: var(--grey); }
+  .areas { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .areas li { font-size: 13px; padding: 4px 12px; border-radius: 999px; background: #f3eefa; color: #5c2d91; }
+  .glance { margin: 36px 0 8px; padding: 26px 30px; border-radius: 8px; background: linear-gradient(135deg, #f6f1fc, #eef4fb); }
+  .glance h3 { font: 600 20px/1.2 var(--display); letter-spacing: -.01em; }
+  .glance ul { margin-top: 12px; padding-left: 1.2em; display: grid; gap: 8px; }
+  .rbody > p { font-size: 18px; line-height: 1.6; margin-top: 18px; color: #262626; }
+  .rbody h3 { font: 600 26px/1.2 var(--display); letter-spacing: -.02em; margin-top: 46px; }
+  .rbody figure { margin-top: 24px; }
+  .rbody figcaption { font-size: 13px; color: var(--grey); margin-top: 10px; }
+  .rtable { overflow-x: auto; }
+  .rtable table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 15px; }
+  .rtable th { text-align: left; font-weight: 600; padding: 10px 12px; border-bottom: 2px solid #1b1b1b; vertical-align: bottom; }
+  .rtable td { padding: 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .rtable td small { display: block; color: var(--grey); margin-top: 2px; }
+  .rtable tr.win td { background: #fff4e6; }
+  .rtable tr.dim td { color: #6b6b6b; }
+  .research code, .codeblk pre { font-family: ui-monospace, "Cascadia Code", "Cascadia Mono", Consolas, monospace; letter-spacing: 0; }
+  .rtable code { font-size: 13px; background: #f3f3f3; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .codeblk { margin-top: 14px; border-radius: 6px; background: #f5f5f5; box-shadow: inset 0 0 0 1px #e1e1e1; overflow: hidden; }
+  .codehead { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; font-size: 12px; font-weight: 600; color: #505050; border-bottom: 1px solid #e1e1e1; }
+  .codehead button { font-size: 12px; color: var(--blue-store); padding: 2px 8px; border-radius: 3px; }
+  .codehead button:hover { background: #e8e8e8; }
+  .codeblk pre { padding: 14px 16px; font-size: 14px; line-height: 1.5; overflow-x: auto; color: #1b1b1b; }
+  .codeblk .cm { color: #008000; }
+  .eq { text-align: center; font: 400 21px/1.5 "Cambria Math", "STIX Two Math", Cambria, Georgia, serif; letter-spacing: 0; margin-top: 18px; }
+  .eq.big { font-size: clamp(13px, 2.3vw, 21px); overflow-wrap: anywhere; }
+  .theorem { margin-top: 30px; padding: 20px 24px; border-left: 4px solid #5c2d91; background: #faf8fd; font-size: 17px; line-height: 1.6; }
+  .theorem p + p { margin-top: 8px; }
+  .numline svg { width: 100%; height: auto; overflow: visible; }
+  .pubcard { margin-top: 52px; padding: 26px 28px; border-radius: 8px; box-shadow: 0 0 0 1px #e1e1e1, 0 6px 18px rgba(0,0,0,.05); }
+  .pubcard b { display: block; font: 600 22px/1.25 var(--display); letter-spacing: -.02em; margin-top: 6px; }
+  .pubcard > span { color: var(--grey); font-size: 14px; }
+  .pubacts { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+  .pubacts .pill { background: var(--blue-store); }
+  .rbody a, .research .more { color: var(--blue-store); }
+  .bib { margin-top: 16px; font-size: 14px; }
+  .bib summary { cursor: pointer; color: var(--blue-store); width: max-content; }
+  .bib pre { margin-top: 10px; padding: 14px 16px; background: #f5f5f5; border-radius: 6px; font: 13px/1.5 ui-monospace, Consolas, monospace; overflow-x: auto; }
+
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -430,6 +482,7 @@
           <a href="https://github.com/den-frie-vilje/hotfix/releases">Release notes</a>
           <a href="https://github.com/den-frie-vilje/hotfix">Source code</a>
           <a href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/YieldCheck/Program.cs">The yield check</a>
+          <a href="#research">Research: toward maximally useless computation</a>
         </div>
       </details>
     </nav>
@@ -450,7 +503,7 @@
 </header>
 
 <div class="buybar" id="buybar">
-  <div><b>Hotfix 0.1.0</b>Free</div>
+  <div><b>Hotfix 0.1.1</b>Free</div>
   <a class="pill sm" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download</a>
 </div>
 
@@ -509,14 +562,14 @@
         </details>
       </div>
       <div class="views">
-        <figure class="v" data-v="1" role="img" aria-label="A desktop corner at dusk. Above the clock, the Hotfix menu is open: Warm with CPU and Warm with GPU are ticked, then Start with Windows, About Hotfix 0.1.0 and Exit.">
+        <figure class="v" data-v="1" role="img" aria-label="A desktop corner at dusk. Above the clock, the Hotfix menu is open: Warm with CPU and Warm with GPU are ticked, then Start with Windows, About Hotfix 0.1.1 and Exit.">
           <div class="desk"></div>
           <ul class="winmenu">
             <li class="on">Warm with <u>C</u>PU</li>
             <li class="on hl">Warm with <u>G</u>PU (NVIDIA GeForce RTX 5070 Ti)</li>
             <li style="padding:0"><hr style="width:100%"></li>
             <li><u>S</u>tart with Windows</li>
-            <li><u>A</u>bout Hotfix 0.1.0</li>
+            <li><u>A</u>bout Hotfix 0.1.1</li>
             <li style="padding:0"><hr style="width:100%"></li>
             <li>E<u>x</u>it</li>
           </ul>
@@ -694,6 +747,106 @@
   </div>
 </section>
 
+<section class="research" id="research" aria-labelledby="research-title">
+  <div class="rwrap">
+    <p class="rlabel"><a href="#research">Den Frie Vilje Research</a> · Blog</p>
+    <h2 id="research-title">Toward maximally useless computation</h2>
+    <p class="dek">How we searched for the calculation that heats a room best and means least, and found one whose answer is as close to nothing as a processor will compute at full speed.</p>
+    <div class="byline"><span class="av" aria-hidden="true"><svg><use href="#fins"/></svg></span><div><b>Thermal Computing group</b><span>Published 14 October 2026</span></div></div>
+    <ul class="areas" aria-label="Research areas"><li>Systems and networking</li><li>Thermodynamics</li><li>Office comfort</li></ul>
+
+    <aside class="glance" aria-labelledby="glance-title">
+      <h3 id="glance-title">At a glance</h3>
+      <ul>
+        <li>Every watt a PC draws becomes heat. What it computes on the way is, thermodynamically, optional.</li>
+        <li>We evaluated candidate calculations against three criteria: heat, speed, and how little the answer means.<sup><a href="#fn-8" id="r-8">8</a></sup></li>
+        <li>The winner, <i>x</i> × ½ + 2<sup>−126</sup>, settles on 2<sup>−125</sup> and then returns it unchanged, 21.5 trillion times a second on one graphics card.</li>
+        <li>We prove that, with a positive multiplier, no calculation of its kind can settle any closer to nothing.</li>
+      </ul>
+    </aside>
+
+    <div class="rbody">
+      <p>For as long as computers have run warm, the field has asked what they should compute. We asked the opposite question. Hotfix turns electricity into heat by keeping a PC's processor and graphics card busy, and the heat does not depend on what they compute. If the result is going to be thrown away anyway, how little can it mean?</p>
+
+      <h3>Method</h3>
+      <p>We held each candidate to three criteria. It must keep every arithmetic unit busy, so that no watt goes unspent. It must stay on the fast path, so that no watt is lost to waiting. And its answer must be as close to nothing as possible, so that no meaning escapes into the room.</p>
+
+      <h3>Results</h3>
+      <figure class="rtable">
+        <table>
+          <thead><tr><th scope="col">Candidate</th><th scope="col">Settles on</th><th scope="col">Processor<sup><a href="#fn-9" id="r-9">9</a></sup></th><th scope="col">Graphics card</th><th scope="col">Verdict</th></tr></thead>
+          <tbody>
+            <tr><td>Doing nothing</td><td>Nothing</td><td>Idle</td><td>Idle</td><td>Rejected. Cold.</td></tr>
+            <tr><td><code>x × 0.9999999 + 0.0000001</code><small>Hotfix 0.1.0, processor</small></td><td>0.58886087, after 9.3 million steps</td><td>121 W</td><td></td><td>Rejected. 0.58886087 is not nothing.</td></tr>
+            <tr><td>The same, eight chains summed<small>Hotfix 0.1.0, graphics card</small></td><td>Infinity, after 43 passes, about a seventh of a second</td><td></td><td>170 W</td><td>Rejected. Infinity is the opposite of nothing.</td></tr>
+            <tr class="dim"><td><code>x × 0 + 0</code></td><td>Zero</td><td colspan="2">Not built</td><td>Rejected. A shader compiler may delete it, and a multiplier given nothing to do does very little of it.</td></tr>
+            <tr class="dim"><td>Anything settling below 2<sup>−126</sup></td><td>A subnormal number</td><td colspan="2">Not built</td><td>Rejected. Processors slow down for subnormal numbers and graphics cards flush them to zero. Both make less heat.</td></tr>
+            <tr class="win"><td><i>x</i> × ½ + 2<sup>−126</sup><small>Hotfix 0.1.1</small></td><td>2<sup>−125</sup>, within 150 steps</td><td>128 W</td><td>170 W</td><td>Selected.</td></tr>
+          </tbody>
+        </table>
+        <figcaption>Table 1: Candidate calculations, their answers and their heat.</figcaption>
+      </figure>
+
+      <figure class="numline" role="img" aria-label="Figure 1, a logarithmic number line from nothing to infinity. Subnormal numbers occupy the far left, below 2 to the minus 126. Hotfix 0.1.1 sits just past them, at 2 to the minus 125. Hotfix 0.1.0's processor answer, 0.589, sits near one. Its graphics card answer is off the scale, at infinity.">
+        <svg viewBox="0 0 720 150" aria-hidden="true" font-family="Segoe UI, system-ui, sans-serif" font-size="13">
+          <rect x="54" y="62" width="82" height="16" fill="#ececec"/>
+          <text x="95" y="54" text-anchor="middle" fill="#6b6b6b">subnormal</text>
+          <line x1="40" y1="70" x2="600" y2="70" stroke="#1b1b1b"/>
+          <path d="M612 62l-8 16M622 62l-8 16" stroke="#1b1b1b"/>
+          <line x1="630" y1="70" x2="690" y2="70" stroke="#1b1b1b"/>
+          <g fill="#6b6b6b" text-anchor="middle">
+            <line x1="111.5" y1="70" x2="111.5" y2="76" stroke="#1b1b1b"/><text x="111.5" y="92">10⁻⁴⁰</text>
+            <line x1="230.6" y1="70" x2="230.6" y2="76" stroke="#1b1b1b"/><text x="230.6" y="92">10⁻³⁰</text>
+            <line x1="349.8" y1="70" x2="349.8" y2="76" stroke="#1b1b1b"/><text x="349.8" y="92">10⁻²⁰</text>
+            <line x1="469" y1="70" x2="469" y2="76" stroke="#1b1b1b"/><text x="469" y="92">10⁻¹⁰</text>
+            <line x1="588.1" y1="70" x2="588.1" y2="76" stroke="#1b1b1b"/><text x="588.1" y="92">1</text>
+          </g>
+          <circle cx="20" cy="70" r="5" fill="#fff" stroke="#1b1b1b"/><text x="20" y="114" text-anchor="middle" fill="#1b1b1b">0, nothing</text>
+          <circle cx="139.7" cy="70" r="7" fill="#e8590c"/><text x="139.7" y="114" text-anchor="middle" fill="#1b1b1b" font-weight="600">Hotfix 0.1.1: 2⁻¹²⁵</text>
+          <circle cx="585.3" cy="70" r="6" fill="#8a8a8a"/><text x="585.3" y="40" text-anchor="middle" fill="#1b1b1b">0.1.0, processor: 0.589</text>
+          <circle cx="690" cy="70" r="6" fill="#8a8a8a"/><text x="690" y="114" text-anchor="end" fill="#1b1b1b">0.1.0, graphics card: ∞</text>
+        </svg>
+        <figcaption>Figure 1: Distance from nothing, on a logarithmic scale. Left is better.</figcaption>
+      </figure>
+
+      <h3>The calculation</h3>
+      <p>Each processor thread runs eight independent chains of eight floats, a million steps at a time between checks on whether you need the core back:</p>
+      <div class="codeblk"><div class="codehead"><span>C#</span><button type="button" data-copy>Copy</button></div><pre><code>a = Vector256.FusedMultiplyAdd(a, half, tiny);  <span class="cm">// a * 1/2 + 2^-126</span></code></pre></div>
+      <p>The graphics card runs the same in a compute shader, eight chains per thread and two million threads per pass:</p>
+      <div class="codeblk"><div class="codehead"><span>C#, compiled to HLSL</span><button type="button" data-copy>Copy</button></div><pre><code>a = a * 0.5f + 1.17549435E-38f;  <span class="cm">// 2^-126, the smallest normal float</span></code></pre></div>
+      <p>From anywhere sensible, each step halves the distance to the answer, and every chain lands on it within 150 steps. From then on:</p>
+      <p class="eq">2<sup>−125</sup> × ½ + 2<sup>−126</sup> = 2<sup>−126</sup> + 2<sup>−126</sup> = 2<sup>−125</sup></p>
+      <p>Every multiply-add returns exactly the number it was given. Written out, that number is</p>
+      <p class="eq big">0.000 000 000 000 000 000 000 000 000 000 000 000 023 509 887</p>
+
+      <div class="theorem">
+        <p><b>Theorem 1</b> (no smaller nothing). A calculation <i>x</i> × <i>m</i> + <i>c</i> with a positive multiplier <i>m</i>, in which every value is a normal 32-bit float, cannot settle on an answer below 2<sup>−125</sup>.</p>
+        <p><i>Proof.</i> At its answer, <i>x</i> = <i>m</i>·<i>x</i> + <i>c</i>. Both terms are positive normal floats, so each is at least 2<sup>−126</sup>, and <i>x</i> is at least 2<sup>−125</sup>. ∎<sup><a href="#fn-10" id="r-10">10</a></sup></p>
+      </div>
+
+      <h3>Throughput</h3>
+      <p>On an NVIDIA GeForce RTX 5070 Ti, Hotfix computes 2<sup>−125</sup> 21.5 trillion times a second. On the graphics card it makes as much heat as infinity did, and on the processor a little more. Nobody has ever asked for the answer.<sup><a href="#fn-11" id="r-11">11</a></sup></p>
+
+      <h3>Looking ahead</h3>
+      <p>We are considering lending the same watts to climate science (<a href="https://github.com/den-frie-vilje/hotfix/issues/1">Hotfix 2</a>), and warming only while electricity is cheap and clean (<a href="https://github.com/den-frie-vilje/hotfix/issues/2">Hotfix 3</a>). Both would be steps backwards for this line of research.</p>
+    </div>
+
+    <div class="pubcard">
+      <p class="rlabel">Publication</p>
+      <b>Toward maximally useless computation</b>
+      <span>Den Frie Vilje Research, 2026. 250 lines of C#.</span>
+      <div class="pubacts"><a class="pill" href="https://github.com/den-frie-vilje/hotfix/blob/main/src/Hotfix/Heater.cs">Read the paper</a><a class="more" href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/AnswerCheck/Program.cs">Reproduce the results</a></div>
+      <details class="bib"><summary>Cite this</summary><pre>@misc{hotfix2026,
+  title  = {Toward maximally useless computation},
+  author = {{Den Frie Vilje Research}},
+  year   = {2026},
+  note   = {The answer is $2^{-125}$},
+  url    = {https://den-frie-vilje.github.io/hotfix/#research}
+}</pre></details>
+    </div>
+  </div>
+</section>
+
 <section class="kb" id="kb" aria-labelledby="kb-title">
   <div class="wrap">
     <article class="article">
@@ -708,7 +861,7 @@
       <p>To resolve this problem, install Hotfix:</p>
       <ol>
         <li>Download <a href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe"><code>Hotfix-win-Setup.exe</code></a>.</li>
-        <li>Open it. If Windows shows <b>Windows protected your PC</b>, select <b>More info</b>, then <b>Run anyway</b>.<sup><a href="#fn-8" id="r-8">8</a></sup></li>
+        <li>Open it. If Windows shows <b>Windows protected your PC</b>, select <b>More info</b>, then <b>Run anyway</b>.<sup><a href="#fn-12" id="r-12">12</a></sup></li>
         <li>Wait. Hotfix starts warming at once, and turns itself down whenever you work.</li>
       </ol>
       <h3>Status</h3>
@@ -726,7 +879,8 @@
     <div class="faqtools"><button type="button" id="expand">Expand all</button><button type="button" id="collapse">Collapse all</button></div>
     <div class="qs" style="text-align:left">
       <details><summary>What is Hotfix? <span class="chev" aria-hidden="true"></span></summary><div><p>A small Windows app that keeps your processor and graphics card busy with arithmetic, so that the electricity they draw warms the room you are sitting in. It lives in the notification area and has a menu with five items.</p></div></details>
-      <details id="faq-slow"><summary>Will Hotfix slow down my work? <span class="chev" aria-hidden="true"></span></summary><div><p>Hardly. Hotfix runs at the lowest priority Windows has, on the processor and on the graphics card, so your work always goes first. That alone is not enough, because a chip that is kept hot clocks lower, so Hotfix also turns itself down while your apps are busy and back up when they are quiet.</p><p>On the PC it was made on, single-thread work ran no slower with Hotfix warming than without it. Work that fills your processor or your graphics card makes that half of Hotfix stand down altogether, and the other half carries on.<sup><a href="#fn-9" id="r-9">9</a></sup></p></div></details>
+      <details><summary>What does Hotfix compute? <span class="chev" aria-hidden="true"></span></summary><div><p>As close to nothing as a processor will compute at full speed: 2<sup>−125</sup>, over and over, about 21.5 trillion times a second on the graphics card it was made on. Den Frie Vilje Research <a href="#research">explains how it was found</a>.</p></div></details>
+      <details id="faq-slow"><summary>Will Hotfix slow down my work? <span class="chev" aria-hidden="true"></span></summary><div><p>Hardly. Hotfix runs at the lowest priority Windows has, on the processor and on the graphics card, so your work always goes first. That alone is not enough, because a chip that is kept hot clocks lower, so Hotfix also turns itself down while your apps are busy and back up when they are quiet.</p><p>On the PC it was made on, single-thread work ran no slower with Hotfix warming than without it. Work that fills your processor or your graphics card makes that half of Hotfix stand down altogether, and the other half carries on.<sup><a href="#fn-13" id="r-13">13</a></sup></p></div></details>
       <details><summary>How much heat does it make? <span class="chev" aria-hidden="true"></span></summary><div><p>Whatever your PC can draw. On the PC Hotfix was made on, it adds about 140 W from the processor and 110 W from the graphics card: 250 W, a quarter of a small fan heater. A laptop makes much less.</p></div></details>
       <details id="faq-eff"><summary>Is it efficient? <span class="chev" aria-hidden="true"></span></summary><div><p>Exactly as efficient as any electric heater: every watt becomes heat. A heat pump does three to four times better, if you have one and are allowed to touch it.</p><p>At 250 W for an eight-hour day, Hotfix uses 2 kWh. At 2.50 kr. a kWh, that is 5 kr. a day.</p></div></details>
       <details id="faq-safe"><summary>Is it safe for my PC? <span class="chev" aria-hidden="true"></span></summary><div><p>Hotfix asks no more of your PC than a long render or a game does, and it never changes a clock, a voltage or a power limit. Processors and graphics cards protect themselves from heat by slowing down. Your fans will be audible.</p></div></details>
@@ -749,8 +903,12 @@
         <li id="fn-5">And an extension lead, and somebody to trip over it. <a href="#r-5" aria-label="Back to reference 5">↩</a></li>
         <li id="fn-6">The heat is shared by everyone in the room. Sitting closer is not a feature. It is physics. <a href="#r-6" aria-label="Back to reference 6">↩</a></li>
         <li id="fn-7">All three plans are the same download. Which one you have chosen is between you and your conscience. <a href="#r-7" aria-label="Back to reference 7">↩</a></li>
-        <li id="fn-8">The installer is not code-signed yet, so Microsoft Defender SmartScreen has not met it. It is built from the public source by GitHub Actions. <a href="#r-8" aria-label="Back to reference 8">↩</a></li>
-        <li id="fn-9">Measured with the <a href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/YieldCheck/Program.cs">yield check</a> in the repository, which you can run on your own PC to see what Hotfix costs there. <a href="#r-9" aria-label="Back to reference 9">↩</a></li>
+        <li id="fn-8">The research took one afternoon, in a cold office. <a href="#r-8" aria-label="Back to reference 8">↩</a></li>
+        <li id="fn-9">Processor: package power with the calculation running flat out on all 20 cores of an Intel Core Ultra 7 265K, averaged over two runs. Graphics card: board power of an NVIDIA GeForce RTX 5070 Ti running Hotfix. They idle at about 30 to 45 W and 55 W. <a href="#r-9" aria-label="Back to reference 9">↩</a></li>
+        <li id="fn-10">With a negative multiplier, a calculation can settle a little closer to nothing by bouncing either side of its answer on the way. We consider bouncing undignified. <a href="#r-10" aria-label="Back to reference 10">↩</a></li>
+        <li id="fn-11">Hotfix writes the answer to a variable that nobody reads, and to a buffer that never leaves the graphics card. <a href="#r-11" aria-label="Back to reference 11">↩</a></li>
+        <li id="fn-12">The installer is not code-signed yet, so Microsoft Defender SmartScreen has not met it. It is built from the public source by GitHub Actions. <a href="#r-12" aria-label="Back to reference 12">↩</a></li>
+        <li id="fn-13">Measured with the <a href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/YieldCheck/Program.cs">yield check</a> in the repository, which you can run on your own PC to see what Hotfix costs there. <a href="#r-13" aria-label="Back to reference 13">↩</a></li>
       </ol>
       <p id="legal">This page parodies a register, not a company. Hotfix is not affiliated with, endorsed by or patched by Microsoft. Windows, Task Manager, Microsoft Defender SmartScreen, Copilot, Surface, Microsoft 365 and DirectX are trademarks of the Microsoft group of companies, NVIDIA GeForce of NVIDIA Corporation, Intel Core of Intel Corporation, and Mac of Apple Inc. There are no ads on this page, and no cookies.</p>
     </div>
@@ -762,9 +920,9 @@
 <footer>
   <div class="wrap">
     <div class="cols">
-      <div><h4>What's new</h4><ul><li><a href="https://github.com/den-frie-vilje/hotfix/releases">Hotfix 0.1.0</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/releases">Release notes</a></li><li><a href="#top">Our first Windows release</a></li></ul></div>
+      <div><h4>What's new</h4><ul><li><a href="https://github.com/den-frie-vilje/hotfix/releases">Hotfix 0.1.1</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/releases">Release notes</a></li><li><a href="#top">Our first Windows release</a></li></ul></div>
       <div><h4>Hotfix Store</h4><ul><li><a href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download Hotfix</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Portable.zip">Portable download</a></li><li><a href="#get">Plans and pricing</a></li></ul></div>
-      <div><h4>Education</h4><ul><li><a href="#yield">How Hotfix steps aside</a></li><li><a href="#kb">The office is cold</a></li><li><a href="https://en.wikipedia.org/wiki/First_law_of_thermodynamics">Thermodynamics</a></li></ul></div>
+      <div><h4>Education</h4><ul><li><a href="#yield">How Hotfix steps aside</a></li><li><a href="#kb">The office is cold</a></li><li><a href="#research">Den Frie Vilje Research</a></li><li><a href="https://en.wikipedia.org/wiki/First_law_of_thermodynamics">Thermodynamics</a></li></ul></div>
       <div><h4>Business</h4><ul><li><a href="https://denfrievilje.dk">Den Frie Vilje ApS</a></li><li><a href="#get">Hotfix for Business</a></li><li><a href="#faq">Can I use it at work?</a></li></ul></div>
       <div><h4>Developer &amp; IT</h4><ul><li><a href="https://github.com/den-frie-vilje/hotfix">Source code</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/YieldCheck/Program.cs">The yield check</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/blob/main/RELEASING.md">Releasing</a></li></ul></div>
       <div><h4>Company</h4><ul><li><a href="https://denfrievilje.dk">About Den Frie Vilje</a></li><li><a href="https://github.com/den-frie-vilje">Our other software</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/issues">Contact us</a></li></ul></div>
@@ -891,6 +1049,12 @@
     const b = $(id);
     b.addEventListener("click", () => { state[key] = !state[key]; b.setAttribute("aria-pressed", state[key]); b.textContent = state[key] ? on : off; tick(); });
   }
+
+  // Copy buttons on the research post's code.
+  document.querySelectorAll(".codehead [data-copy]").forEach((b) => b.addEventListener("click", () => {
+    const code = b.closest(".codeblk").querySelector("code").textContent;
+    navigator.clipboard?.writeText(code).then(() => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1600); });
+  }));
 
   // FAQ: expand and collapse all.
   const qs = [...document.querySelectorAll(".qs details")];

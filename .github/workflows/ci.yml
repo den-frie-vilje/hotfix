@@ -14,6 +14,8 @@ jobs:
           dotnet-version: 10.0.x
       - name: Build the app and the yield check, warnings as errors
         run: dotnet build Hotfix.slnx -c Release -warnaserror
+      - name: Hotfix still computes 2^-125 and nothing else (the runner has no GPU, so mostly the CPU half)
+        run: dotnet run --project tests/AnswerCheck -c Release --no-build
       - name: Publish the app as the release does
         run: dotnet publish src/Hotfix -c Release -r win-x64 --self-contained -o publish
       - name: Landing page is well formed

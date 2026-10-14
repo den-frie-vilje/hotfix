@@ -13,6 +13,14 @@ README link to `releases/latest/download/Hotfix-win-Setup.exe`, so they follow w
    dotnet run --project tests/YieldCheck -c Release -- publish\Hotfix.exe
    ```
 
+   The yield check needs a quiet PC and exits 3 without a verdict when other apps are busy. Then run the answer
+   check, which holds the shipped calculation to what the research post on the landing page says, and prints
+   the throughput it quotes:
+
+   ```powershell
+   dotnet run --project tests/AnswerCheck -c Release
+   ```
+
    If the numbers moved, update the ones the landing page and the README quote, and the machine they were
    measured on.
 3. Commit with a message that says what changed and why, then tag with the release notes as the tag message;

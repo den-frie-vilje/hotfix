@@ -116,10 +116,12 @@ static class Heater
     static void BurnCpu(ManualResetEventSlim gate)
     {
         SetThreadPriority(GetCurrentThread(), IdleThreadPriority);
-        // Eight independent AVX FMA chains keep both FMA ports busy, all in registers, so caches stay yours.
-        var m = Vector256.Create(0.9999999f);
-        var c = Vector256.Create(1e-7f);
-        Vector256<float> a = c, b = c, d = c, e = c, f = c, g = c, h = c, k = c;
+        // Eight independent AVX FMA chains keep both FMA ports busy, all in registers, so caches stay yours. Each
+        // starts on the answer, so every multiply-add returns exactly the number it was given (see Burn).
+        var m = Vector256.Create(Burn.Half);
+        var c = Vector256.Create(Burn.Tiny);
+        var a = Vector256.Create(Burn.Answer);
+        Vector256<float> b = a, d = a, e = a, f = a, g = a, h = a, k = a;
         while (true)
         {
             gate.Wait();
@@ -138,9 +140,13 @@ static class Heater
         }
     }
 
+    /// <summary>The GPU's working buffer, one float per thread, starting on the answer.</summary>
+    internal static ReadWriteBuffer<float> NewBuffer(GraphicsDevice device) =>
+        device.AllocateReadWriteBuffer(Enumerable.Repeat(Burn.Answer, 1 << 21).ToArray());
+
     static void BurnGpu(GraphicsDevice device)
     {
-        using var buffer = device.AllocateReadWriteBuffer<float>(1 << 21);
+        using var buffer = NewBuffer(device);
         var window = new Stopwatch();
         while (true)
         {
@@ -215,22 +221,30 @@ static class Heater
 [GeneratedComputeShaderDescriptor]
 readonly partial struct Burn(ReadWriteBuffer<float> buffer) : IComputeShader
 {
+    // Hotfix's one calculation, on the CPU and the GPU: x × Half + Tiny. It settles on Answer, 2⁻¹²⁵, and stays there,
+    // so every multiply-add returns the number it was given. That is as close to nothing as a calculation of this
+    // shape can settle while every value stays a normal float: anything smaller is subnormal, which CPUs handle slowly
+    // and GPUs flush to zero, and either way they would make less heat. tests/AnswerCheck holds the code to it.
+    public const float Half = 0.5f;
+    public const float Tiny = 1.17549435E-38f; // 2⁻¹²⁶, the smallest normal float
+    public const float Answer = 2.3509887E-38f; // 2⁻¹²⁵
+
     public void Execute()
     {
         // Eight independent chains, pure ALU: heat without taking VRAM bandwidth from your work. They start
-        // apart so the compiler cannot fold them into one.
+        // apart so the compiler cannot fold them into one, and all settle on Answer within 150 steps.
         float a = buffer[ThreadIds.X], b = a + 1, c = a + 2, d = a + 3, e = a + 4, f = a + 5, g = a + 6, h = a + 7;
         for (int i = 0; i < 4096; i++)
         {
-            a = a * 0.9999999f + 0.0000001f;
-            b = b * 0.9999999f + 0.0000001f;
-            c = c * 0.9999999f + 0.0000001f;
-            d = d * 0.9999999f + 0.0000001f;
-            e = e * 0.9999999f + 0.0000001f;
-            f = f * 0.9999999f + 0.0000001f;
-            g = g * 0.9999999f + 0.0000001f;
-            h = h * 0.9999999f + 0.0000001f;
+            a = a * Half + Tiny;
+            b = b * Half + Tiny;
+            c = c * Half + Tiny;
+            d = d * Half + Tiny;
+            e = e * Half + Tiny;
+            f = f * Half + Tiny;
+            g = g * Half + Tiny;
+            h = h * Half + Tiny;
         }
-        buffer[ThreadIds.X] = a + b + c + d + e + f + g + h;
+        buffer[ThreadIds.X] = (a + b + c + d + e + f + g + h) * 0.125f; // their mean, which is Answer again
     }
 }

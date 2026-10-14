@@ -101,6 +101,12 @@ Hotfix gets out of your way twice over, separately for the processor and the gra
 
 The CPU half runs eight chains of AVX fused multiply-adds on each processor thread it uses. They keep the floating-point units busy without touching memory. The GPU half runs a compute shader that does the same on every core of the graphics card, in slices of a few milliseconds.
 
+Both compute x × ½ + 2⁻¹²⁶, which settles on 2⁻¹²⁵ and stays there, so every multiply-add returns exactly the number it was given. That is as close to nothing as a calculation of its kind can settle while every value stays a normal float, and smaller, subnormal numbers would slow the chips down and make less heat. Den Frie Vilje Research [explains how it was found](https://den-frie-vilje.github.io/hotfix/#research), and [the answer check](tests/AnswerCheck/Program.cs) holds the shipped code to it:
+
+```powershell
+dotnet run --project tests/AnswerCheck -c Release
+```
+
 ### What it costs you
 
 On the PC Hotfix was made on, a Dell Pro Max Tower T2 with an Intel Core Ultra 7 265K and an NVIDIA GeForce RTX 5070 Ti, Hotfix adds about 140 W of package power and 110 W of graphics board power above idle. Single-thread work ran no slower with Hotfix warming than without it.
@@ -111,13 +117,18 @@ On the PC Hotfix was made on, a Dell Pro Max Tower T2 with an Intel Core Ultra 7
 dotnet run --project tests/YieldCheck -c Release -- "$env:LOCALAPPDATA\Hotfix\current\Hotfix.exe"
 ```
 
+## 🛣️ Roadmap
+
+- **Hotfix 2: compute for climate science.** Lend the same watts to volunteer climate research through BOINC, with Hotfix still in charge of when they are spent. [#1](https://github.com/den-frie-vilje/hotfix/issues/1)
+- **Hotfix 3: warm while the grid is cheap and clean.** Your own price and carbon thresholds, from Energinet's Energi Data Service in Denmark. [#2](https://github.com/den-frie-vilje/hotfix/issues/2)
+
 ## ✨ What's new
 
 The [release notes](https://github.com/den-frie-vilje/hotfix/releases) list what changed in each version.
 
 ## Contributing
 
-Issues and pull requests are welcome. If you change how Hotfix yields, run the yield check before and after, and put both tables in the pull request.
+Issues and pull requests are welcome. If you change how Hotfix yields, run the yield check before and after, and put both tables in the pull request. If you change what it computes, the answer check must still pass, and the research post must still be true.
 
 ## Privacy statement
 
