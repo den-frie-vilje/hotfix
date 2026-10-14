@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toward Maximally Useless Computation</title>
+<meta name="description" content="Den Frie Vilje Research technical report DFV-TR-2026-01: the calculation that heats a room best and means least.">
+<meta name="author" content="Thermal Computing group, Den Frie Vilje Research">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect x='8' y='16' width='48' height='224' rx='24' fill='%23C42B1C'/%3E%3Crect x='72' y='16' width='48' height='224' rx='24' fill='%23E8590C'/%3E%3Crect x='136' y='16' width='48' height='224' rx='24' fill='%23F59F00'/%3E%3Crect x='200' y='16' width='48' height='224' rx='24' fill='%23FCC419'/%3E%3C/svg%3E">
+<style>
+  /* A technical report, set for A4. To print the PDF, from docs/paper:
+       msedge --headless --no-pdf-header-footer --print-to-pdf=DFV-TR-2026-01.pdf index.html
+     (with full paths to msedge.exe and the files). On screen it shows as pages on a grey desk. */
+  @page { size: A4; margin: 22mm 18mm 22mm;
+    @top-center { content: "DFV-TR-2026-01 · Toward Maximally Useless Computation"; font: 7.5pt Cambria, Georgia, serif; color: #666; }
+    @bottom-center { content: counter(page) " of " counter(pages); font: 8pt Cambria, Georgia, serif; color: #444; } }
+  @page :first { @top-center { content: none; } }
+  * { box-sizing: border-box; }
+  html { background: #e6e6e6; }
+  body { margin: 0; font: 9.6pt/1.4 Cambria, "STIX Two Text", Georgia, serif; color: #141414; hyphens: auto; text-rendering: optimizeLegibility; font-variant-numeric: oldstyle-nums proportional-nums; }
+  .sheet { background: #fff; }
+  @media screen {
+    body { padding: 24px 12px; }
+    .sheet { max-width: 210mm; margin: 0 auto; padding: 22mm 18mm; box-shadow: 0 2px 18px rgba(0,0,0,.18); }
+    .print-note { max-width: 210mm; margin: 0 auto 12px; font: 13px/1.4 "Segoe UI", system-ui, sans-serif; color: #444; }
+    .print-note a { color: #0067b8; }
+  }
+  @media print { .print-note { display: none; } html, body { background: #fff; } }
+  @media screen and (max-width: 760px) { .sheet { padding: 16px; } .cols { column-count: 1 !important; } }
+
+  header.title { text-align: center; margin-bottom: 7mm; }
+  .series { font: 600 8pt/1.2 "Segoe UI", system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #5c2d91; }
+  h1 { font: 700 21pt/1.12 Cambria, Georgia, serif; margin: 3mm 0 3mm; letter-spacing: -.01em; }
+  .authors { font-size: 11pt; }
+  .affil { font-size: 9pt; color: #444; margin-top: 1mm; }
+  .affil a { color: inherit; }
+  .abstract { margin: 6mm 9mm 7mm; font-size: 9.2pt; text-align: justify; }
+  .abstract b { font-variant: small-caps; letter-spacing: .03em; }
+  .keywords { margin: -4mm 9mm 7mm; font-size: 8.6pt; color: #333; }
+
+  .cols { column-count: 2; column-gap: 7mm; text-align: justify; }
+  h2 { font: 700 10.6pt/1.25 Cambria, Georgia, serif; margin: 5mm 0 2mm; break-after: avoid; }
+  h3 { font: 700 9.6pt/1.25 Cambria, Georgia, serif; font-style: italic; margin: 3.5mm 0 1.2mm; break-after: avoid; }
+  p { margin: 0 0 2mm; orphans: 3; widows: 3; }
+  p + p { text-indent: 1.2em; margin-top: -1mm; }
+  ul.contrib { margin: 1mm 0 2.5mm; padding-left: 4.5mm; }
+  ul.contrib li { margin-bottom: .8mm; }
+  a { color: #0b4f8a; text-decoration: none; }
+  sup.fn { font-size: 7pt; }
+  .cite { white-space: nowrap; }
+
+  math { font-family: "Cambria Math", "STIX Two Math", math; font-size: 1.05em; }
+  .eqn { display: flex; align-items: center; margin: 2.2mm 0; break-inside: avoid; }
+  .eqn math { flex: 1; }
+  .eqn .no { font-size: 9pt; }
+
+  .thm { margin: 2.5mm 0; padding: 2.4mm 3mm; background: #f6f3fa; border-left: 2.2pt solid #5c2d91; break-inside: avoid; text-indent: 0; }
+  .thm p { text-indent: 0; margin: 0 0 1.2mm; }
+  .thm p:last-child { margin-bottom: 0; }
+  .thm .label { font-weight: 700; font-style: normal; }
+  .thm .stmt { font-style: italic; }
+  .qed { float: right; }
+
+  figure { margin: 3mm 0 3.5mm; break-inside: avoid; }
+  figure.wide { column-span: all; margin: 2mm 0 5mm; }
+  figcaption { font-size: 8.4pt; line-height: 1.35; margin-top: 1.6mm; text-align: left; }
+  figcaption b { font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.6pt; line-height: 1.3; text-align: left; font-variant-numeric: lining-nums tabular-nums; }
+  thead th { border-top: 1pt solid #141414; border-bottom: .6pt solid #141414; padding: 1.4mm 1.6mm; font-weight: 700; vertical-align: bottom; }
+  tbody td { padding: 1.3mm 1.6mm; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 1pt solid #141414; }
+  tbody tr.sel td { background: #fff3e3; }
+  tbody tr.dim td { color: #555; }
+  td small { display: block; color: #555; font-size: 7.8pt; }
+  pre { margin: 0; padding: 2.2mm 2.6mm; background: #f5f5f5; border: .5pt solid #ddd; font: 7.6pt/1.42 "Cascadia Mono", Consolas, ui-monospace, monospace; white-space: pre; overflow-x: auto; text-align: left; hyphens: none; }
+  pre .c { color: #2e7d32; }
+  code { font: .88em "Cascadia Mono", Consolas, ui-monospace, monospace; hyphens: none; }
+  code, pre { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; font-variant-numeric: normal; }
+  @media print { pre { overflow: hidden; } }
+  svg { display: block; width: 100%; height: auto; }
+
+  .refs { font-size: 8.4pt; line-height: 1.35; padding-left: 0; list-style: none; text-align: left; }
+  .refs li { display: grid; grid-template-columns: 6mm 1fr; margin-bottom: 1.4mm; break-inside: avoid; }
+  .refs a { word-break: break-all; }
+  .small { font-size: 8.6pt; }
+</style>
+</head>
+<body>
+<p class="print-note">This is the HTML version of the paper. <a href="DFV-TR-2026-01.pdf">Download the PDF</a> · <a href="../#research">Back to the research post</a></p>
+<article class="sheet">
+
+<header class="title">
+  <div class="series">Den Frie Vilje Research · Technical report DFV-TR-2026-01 · 14 October 2026</div>
+  <h1>Toward Maximally Useless Computation</h1>
+  <div class="authors">Thermal Computing group<sup class="fn">*</sup></div>
+  <div class="affil">Den Frie Vilje Research, Denmark · <a href="https://github.com/den-frie-vilje/hotfix">github.com/den-frie-vilje/hotfix</a></div>
+</header>
+
+<p class="abstract"><b>Abstract.</b> Every watt a computer draws ends up as heat, and what it computes on the way is, thermodynamically, optional. We ask how little a heating computation can mean. We set out three criteria for useless computation, which are occupancy, speed and meaninglessness, and assess five candidate calculations on a desktop PC. We present a calculation, <i>x</i> ← <i>x</i>/2 + 2<sup>−126</sup>, which settles on 2<sup>−125</sup> within about 150 steps and from then on returns its input unchanged, and we prove that no multiply-add with a positive multiplier can settle lower while every value remains a normal 32-bit float. On an NVIDIA GeForce RTX 5070 Ti it runs 21.5 trillion multiply-adds a second, every one of them returning 2<sup>−125</sup>, at about the same board power as the calculation it replaces, which computed infinity. On the processor it draws slightly more. Once settled, it erases no information, so Landauer's bound on the heat it must dissipate is zero. It dissipates the heat anyway. We consider this a success.</p>
+<p class="keywords"><b>Keywords:</b> heating, floating point, subnormal numbers, thermodynamics of computation, offices</p>
+
+<div class="cols">
+
+<h2>1&ensp;Introduction</h2>
+<p>For as long as computers have run warm, the field has asked what they should compute. We ask the opposite question. Hotfix <span class="cite">[5]</span> is a Windows application that warms a room by keeping a PC's processor and graphics card busy while nothing else needs them. By the first law of thermodynamics, the electrical energy those parts draw leaves them as heat, whatever they compute. If the result is going to be thrown away anyway, how little can it mean?</p>
+<p>This report makes the following contributions:</p>
+<ul class="contrib">
+  <li>three criteria for useless computation (Section 3);</li>
+  <li>an evaluation of five candidate calculations against them (Section 4);</li>
+  <li>a calculation whose answer, 2<sup>−125</sup>, is as close to nothing as a processor will compute at full speed, with a proof that no calculation of its kind does better (Section 5);</li>
+  <li>measurements showing that meaning less costs no heat (Section 6);</li>
+  <li>an open-source implementation, and a test that holds it to all of the above <span class="cite">[5]</span>.</li>
+</ul>
+
+<h2>2&ensp;Background</h2>
+<h3>2.1&ensp;Heat</h3>
+<p>A PC converts practically all the electrical energy it draws into heat in the room it stands in, so as a heater it is exactly as efficient as any other resistive heater. Landauer <span class="cite">[1]</span> showed that a computation must dissipate at least <i>k</i><sub>B</sub><i>T</i> ln 2 of heat for each bit of information it erases, about 2.8 × 10<sup>−21</sup> J at room temperature. The bound applies only to logically irreversible steps. A step that erases nothing has no lower bound at all.</p>
+<h3>2.2&ensp;Floating point</h3>
+<p>A normal 32-bit float carries a 24-bit significand and an exponent from −126 to 127 <span class="cite">[2]</span>. The smallest positive normal float is 2<sup>−126</sup> ≈ 1.18 × 10<sup>−38</sup>. Below it lie the subnormal numbers, down to 2<sup>−149</sup>, which trade precision for range. Processors often handle subnormal operands and results on a slow path, in microcode, unless told to flush them to zero <span class="cite">[3]</span>. Direct3D's floating-point rules let graphics cards flush subnormal 32-bit values to zero <span class="cite">[4]</span>. Either way, a calculation that strays into subnormal numbers does less work per second, and makes less heat, than one that stays normal.</p>
+
+<h2>3&ensp;Criteria</h2>
+<p>We hold a candidate calculation to three criteria.</p>
+<p><b>C1, occupancy.</b> It must keep every arithmetic unit busy. On the processor that means enough independent chains of fused multiply-adds to fill both vector pipelines of every core; on the graphics card, enough threads to fill every streaming multiprocessor. It must not touch memory beyond registers, so that the caches and memory bandwidth remain available to the user's own work.</p>
+<p><b>C2, speed.</b> Every value must stay a normal float, so that no cycle is lost to the slow path of Section 2.2.</p>
+<p><b>C3, meaninglessness.</b> Its answer must be as close to nothing as possible, and nobody may read it.</p>
+
+<h2>4&ensp;Candidates</h2>
+<p>Table 1 lists the candidates. Two of them shipped. Hotfix 0.1.0 ran <i>x</i> ← 0.9999999<i>x</i> + 0.0000001 on both parts. On the processor its eight chains per thread settled on 0.58886087 after 9,263,816 steps, about a hundredth of a second, at which point the change at each step was smaller than half a unit in the last place and every step returned its input. That satisfied C1 and C2 but not C3: 0.58886087 is not nothing.</p>
+<p>On the graphics card, the same calculation summed its eight chains and wrote the sum back for the next pass to start from, so each pass multiplied the stored value by about eight. In simulation the value overflowed to infinity after 43 passes, about a seventh of a second of heating, and stayed there. Infinity satisfies C2 in the sense that the hardware handles it at full speed. It is, however, the opposite of nothing.</p>
+<p>We also considered, without building them, <i>x</i> ← 0·<i>x</i> + 0, whose answer is exactly nothing but which an optimising shader compiler is entitled to delete, and any calculation settling below 2<sup>−126</sup>, which fails C2 by Section 2.2. Figure 1 places the answers on a number line.</p>
+
+<figure class="wide">
+<table>
+  <thead><tr><th style="width:27%">Candidate</th><th style="width:25%">Settles on</th><th>Processor<sup>a</sup></th><th>Graphics card<sup>b</sup></th><th style="width:25%">Verdict</th></tr></thead>
+  <tbody>
+    <tr><td>Doing nothing</td><td>Nothing</td><td>Idle, 23–47 W</td><td>Idle, 50–58 W</td><td>Fails C1. Cold.</td></tr>
+    <tr><td><code>x × 0.9999999 + 0.0000001</code><small>Hotfix 0.1.0, processor</small></td><td>0.58886087, after 9.3 million steps</td><td>121–122 W</td><td></td><td>Fails C3.</td></tr>
+    <tr><td>The same, eight chains summed<small>Hotfix 0.1.0, graphics card</small></td><td>+∞, after 43 passes</td><td></td><td>170–171 W</td><td>Fails C3 emphatically.</td></tr>
+    <tr class="dim"><td><code>x × 0 + 0</code></td><td>0</td><td colspan="2">Not built</td><td>May be deleted by the compiler.</td></tr>
+    <tr class="dim"><td>Anything settling below 2<sup>−126</sup></td><td>A subnormal number</td><td colspan="2">Not built</td><td>Fails C2.</td></tr>
+    <tr class="sel"><td><i>x</i> × ½ + 2<sup>−126</sup><small>Hotfix 0.1.1, both parts</small></td><td>2<sup>−125</sup>, within about 150 steps</td><td>126–130 W</td><td>163–170 W</td><td>Selected.</td></tr>
+  </tbody>
+</table>
+<figcaption><b>Table 1.</b> Candidate calculations. <sup>a</sup>Package power, the calculation running flat out on all 20 cores, two runs. <sup>b</sup>Board power with Hotfix running, two runs. Idle ranges were measured on the same PC on the same afternoon. Section 6 describes the setup.</figcaption>
+</figure>
+
+<figure class="wide">
+<svg viewBox="0 12 330 66" style="max-width:150mm;margin:0 auto" aria-label="A logarithmic number line from zero to infinity: the subnormal range at the far left, Hotfix 0.1.1 at 2 to the minus 125 just past it, Hotfix 0.1.0's processor answer near one, and its graphics card answer at infinity." role="img" font-family="Cambria, Georgia, serif" font-size="6">
+  <rect x="24.2" y="37" width="37.4" height="10" fill="#e9e9e9"/>
+  <text x="44" y="32" text-anchor="middle" fill="#555">subnormal</text>
+  <line x1="18" y1="42" x2="272" y2="42" stroke="#141414" stroke-width=".7"/>
+  <path d="M279 37l-4 10M284 37l-4 10" stroke="#141414" stroke-width=".7"/>
+  <line x1="288" y1="42" x2="318" y2="42" stroke="#141414" stroke-width=".7"/>
+  <g fill="#555" text-anchor="middle">
+    <line x1="50.4" y1="42" x2="50.4" y2="45.5" stroke="#141414" stroke-width=".6"/><text x="50.4" y="55">10⁻⁴⁰</text>
+    <line x1="104.5" y1="42" x2="104.5" y2="45.5" stroke="#141414" stroke-width=".6"/><text x="104.5" y="55">10⁻³⁰</text>
+    <line x1="158.5" y1="42" x2="158.5" y2="45.5" stroke="#141414" stroke-width=".6"/><text x="158.5" y="55">10⁻²⁰</text>
+    <line x1="212.5" y1="42" x2="212.5" y2="45.5" stroke="#141414" stroke-width=".6"/><text x="212.5" y="55">10⁻¹⁰</text>
+    <line x1="266.6" y1="42" x2="266.6" y2="45.5" stroke="#141414" stroke-width=".6"/><text x="266.6" y="55">1</text>
+  </g>
+  <circle cx="8" cy="42" r="2.6" fill="#fff" stroke="#141414" stroke-width=".7"/><text x="8" y="70" text-anchor="start" fill="#141414">0</text>
+  <circle cx="63.2" cy="42" r="3.4" fill="#e8590c"/><text x="63.2" y="70" text-anchor="middle" fill="#141414" font-weight="700">0.1.1: 2⁻¹²⁵</text>
+  <circle cx="265.3" cy="42" r="3" fill="#8a8a8a"/><text x="265.3" y="22" text-anchor="middle" fill="#141414">0.1.0, processor: 0.589</text>
+  <circle cx="318" cy="42" r="3" fill="#8a8a8a"/><text x="322" y="70" text-anchor="end" fill="#141414">0.1.0, graphics card: +∞</text>
+</svg>
+<figcaption><b>Figure 1.</b> Distance from nothing, on a logarithmic scale. Left is better.</figcaption>
+</figure>
+
+<h2>5&ensp;The selected calculation</h2>
+<p>Hotfix 0.1.1 runs, on both parts,</p>
+<div class="eqn"><math display="block"><msub><mi>x</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mfrac><msub><mi>x</mi><mi>n</mi></msub><mn>2</mn></mfrac><mo>+</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>126</mn></mrow></msup><mo>.</mo></math><span class="no">(1)</span></div>
+<p>Writing <i>e</i><sub><i>n</i></sub> = <i>x</i><sub><i>n</i></sub> − 2<sup>−125</sup> gives <i>e</i><sub><i>n</i>+1</sub> = <i>e</i><sub><i>n</i></sub>/2, so each step halves the distance to the answer, and from any starting value up to 8 the chain lands on 2<sup>−125</sup> exactly within about 150 steps, once the remaining distance rounds away. There it stays, because</p>
+<div class="eqn"><math display="block"><msup><mn>2</mn><mrow><mo>−</mo><mn>125</mn></mrow></msup><mo>×</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>+</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>126</mn></mrow></msup><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>126</mn></mrow></msup><mo>+</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>126</mn></mrow></msup><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>125</mn></mrow></msup></math><span class="no">(2)</span></div>
+<p>exactly, with or without fused rounding, and every value involved, including the product, is a normal float. Written out, the answer is 0.000 000 000 000 000 000 000 000 000 000 000 000 023 509 887.</p>
+
+<div class="thm">
+<p class="stmt"><span class="label">Theorem 1</span> (no smaller nothing). A calculation <i>x</i> ← <i>m</i>·<i>x</i> + <i>c</i> with 0 &lt; <i>m</i> &lt; 1, in which every value is a normal 32-bit float, cannot settle on an answer smaller in magnitude than 2<sup>−125</sup>.</p>
+<p><i>Proof.</i> At its answer, <i>x</i> = <i>m</i>·<i>x</i> + <i>c</i>, so (1 − <i>m</i>)<i>x</i> = <i>c</i>, and <i>x</i>, <i>m</i>·<i>x</i> and <i>c</i> share a sign. The product and the constant are normal floats, so each is at least 2<sup>−126</sup> in magnitude, and |<i>x</i>| = |<i>m</i>·<i>x</i>| + |<i>c</i>| ≥ 2<sup>−125</sup>. Equation (2) shows the bound is attained. <span class="qed">∎</span></p>
+</div>
+
+<p><b>Remark 1.</b> With −1 &lt; <i>m</i> &lt; −½ a calculation can settle strictly between 2<sup>−126</sup> and 2<sup>−125</sup>, approaching its answer from alternate sides. We consider bouncing undignified.</p>
+
+<p>Listing 1 shows the processor's inner loop. Each of a PC's logical processors runs one such thread, at idle priority, with eight independent chains of eight floats each, so that both fused multiply-add pipelines stay full. The chains start on the answer, so on the processor every step returns its input from the first.</p>
+<figure>
+<pre><span class="c">// Hotfix 0.1.1, src/Hotfix/Heater.cs (abridged)</span>
+var m = Vector256.Create(Burn.Half);    <span class="c">// 1/2</span>
+var c = Vector256.Create(Burn.Tiny);    <span class="c">// 2^-126</span>
+var a = Vector256.Create(Burn.Answer);  <span class="c">// 2^-125</span>
+Vector256&lt;float&gt; b = a, d = a, e = a, f = a,
+                 g = a, h = a, k = a;
+for (int i = 0; i &lt; 1_000_000; i++)
+{
+    a = Vector256.FusedMultiplyAdd(a, m, c);
+    b = Vector256.FusedMultiplyAdd(b, m, c);
+    <span class="c">// ... and d, e, f, g, h, k likewise</span>
+}
+sink = (a + b + d + e + f + g + h + k)
+       .GetElement(0);  <span class="c">// never read</span></pre>
+<figcaption><b>Listing 1.</b> The processor's calculation, one million steps between checks on whether the user needs the core back.</figcaption>
+</figure>
+<p>Listing 2 shows the graphics card's compute shader, which runs over 2<sup>21</sup> threads per pass. Its chains must start apart, or the shader compiler would merge them into one and fail C1; they start at <i>a</i>, <i>a</i> + 1, …, <i>a</i> + 7 and converge within the first 150 of each pass's 4,096 steps. The thread writes back the mean of its chains, which is the answer again, so the next pass starts where this one finished.</p>
+<figure>
+<pre><span class="c">// Hotfix 0.1.1, the Burn compute shader (abridged)</span>
+float a = buffer[ThreadIds.X], b = a + 1, ...,
+      h = a + 7;
+for (int i = 0; i &lt; 4096; i++)
+{
+    a = a * Half + Tiny;
+    <span class="c">// ... and b to h likewise</span>
+}
+buffer[ThreadIds.X] =
+    (a + b + ... + h) * 0.125f;  <span class="c">// the mean</span></pre>
+<figcaption><b>Listing 2.</b> The graphics card's calculation. The buffer starts on the answer and never leaves the card.</figcaption>
+</figure>
+
+<h2>6&ensp;Evaluation</h2>
+<h3>6.1&ensp;Setup</h3>
+<p>We measured on a Dell Pro Max Tower T2 with an Intel Core Ultra 7 265K (20 cores, 20 threads) and an NVIDIA GeForce RTX 5070 Ti, running Windows 11 version 25H2, in an office that was cold. Package power came from the processor's RAPL counter through Windows' Energy Meter, and board power from <code>nvidia-smi</code>. Other applications ran throughout, as they would in use, using about 15 to 20 per cent of the processor.</p>
+<h3>6.2&ensp;Heat</h3>
+<p>To compare the two processor calculations without Hotfix's own yielding getting in the way, a harness ran each flat out on all 20 threads for nine seconds, measuring the last six, alternating old and new twice. The old calculation drew 121 and 122 W, the new one 126 and 130 W. On the graphics card we ran Hotfix itself, alternating 0.1.0 and 0.1.1: the old shader drew 171 and 170 W, the new one 163 and 170 W. We conclude that computing 2<sup>−125</sup> makes at least as much heat as computing 0.58886087 or infinity, and slightly more on the processor. Two runs each do not support a finer conclusion, and we do not draw one.</p>
+<h3>6.3&ensp;Throughput and correctness</h3>
+<p>The answer check <span class="cite">[5]</span> runs the shipped shader on the shipped buffer. On the RTX 5070 Ti all 2,097,152 threads returned exactly 2<sup>−125</sup> after three passes, and fifty further passes ran at 21.5 and 21.9 trillion multiply-adds a second in two runs. In continuous integration, on a GitHub-hosted runner with no graphics card, the same check passed on Windows' software renderer for 4,096 threads.</p>
+
+<h2>7&ensp;Discussion</h2>
+<p><b>Landauer accounting.</b> Once settled, the calculation maps 2<sup>−125</sup> to 2<sup>−125</sup>: it is the identity, which erases no information, so Landauer's bound on the heat it must dissipate is zero. On the processor that holds from the first step. On the graphics card, the first 150 or so of each chain's 4,096 steps per pass converge from where the chain started, and those steps do erase information; across the eight chains, about 3 per cent of all steps. The remaining 97 per cent are, thermodynamically, free. The graphics card nevertheless dissipates about 5 pJ per multiply-add above idle (115 W over 21.5 × 10<sup>12</sup> a second), roughly two billion times the Landauer cost of erasing one bit, for operations that erase none. All of Hotfix's heat is therefore surplus to thermodynamic requirements, which is what a heater is for.</p>
+<p><b>Usefulness.</b> Hotfix writes the processor's answer to a field that nothing reads, and the graphics card's to a buffer that is never copied back to the processor. As far as we can determine, the answer has never been observed in use.</p>
+
+<h2>8&ensp;Limitations</h2>
+<p>We measured one PC, with other applications running, two runs per condition. Heat is not comfort: a room's temperature depends on its size, its insulation and its occupants, none of which we controlled. Hotfix also turns its heat down while the user's own applications are busy, which this report does not evaluate; the yield check in the repository does <span class="cite">[5]</span>. The research took one afternoon.</p>
+
+<h2>9&ensp;Future work</h2>
+<p>Two directions threaten the results reported here. The first lends the same watts to volunteer climate research <span class="cite">[5, issue 1]</span>; the second heats only while electricity is cheap and the grid is clean, using Energinet's open price and emissions data <span class="cite">[6]</span> <span class="cite">[5, issue 2]</span>. Both would make the computation more useful, and we pursue them with reluctance.</p>
+
+<h2>Acknowledgements</h2>
+<p>We thank the office, for being cold.</p>
+<h2>Funding</h2>
+<p>This work received no funding. It consumed some.</p>
+<h2>Code and data</h2>
+<p>All code, including the answer check that reproduces Section 6.3 and the yield check, is MIT-licensed at <a href="https://github.com/den-frie-vilje/hotfix">github.com/den-frie-vilje/hotfix</a>. To reproduce Section 6.3, run:</p>
+<pre>dotnet run --project tests/AnswerCheck -c Release</pre>
+
+<h2>References</h2>
+<ol class="refs">
+  <li><span>[1]</span><span>R. Landauer. Irreversibility and heat generation in the computing process. <i>IBM Journal of Research and Development</i>, 5(3):183–191, 1961. <a href="https://doi.org/10.1147/rd.53.0183">doi:10.1147/rd.53.0183</a></span></li>
+  <li><span>[2]</span><span>IEEE. <i>IEEE Standard for Floating-Point Arithmetic</i>, IEEE Std 754-2019. <a href="https://doi.org/10.1109/IEEESTD.2019.8766229">doi:10.1109/IEEESTD.2019.8766229</a></span></li>
+  <li><span>[3]</span><span>Intel Corporation. <i>Intel 64 and IA-32 Architectures Optimization Reference Manual</i>, on denormal numbers and the flush-to-zero and denormals-are-zero modes.</span></li>
+  <li><span>[4]</span><span>Microsoft. <i>Direct3D 11.3 Functional Specification</i>, floating-point rules. <a href="https://microsoft.github.io/DirectX-Specs/d3d/archive/D3D11_3_FunctionalSpec.htm">microsoft.github.io/DirectX-Specs</a></span></li>
+  <li><span>[5]</span><span>Den Frie Vilje. <i>Hotfix</i>, version 0.1.1, 2026. <a href="https://github.com/den-frie-vilje/hotfix">github.com/den-frie-vilje/hotfix</a></span></li>
+  <li><span>[6]</span><span>Energinet. <i>Energi Data Service</i>: datasets DayAheadPrices, CO2Emis and CO2EmisProg. <a href="https://www.energidataservice.dk/">energidataservice.dk</a></span></li>
+</ol>
+<p class="small"><sup class="fn">*</sup>Correspondence: <a href="https://github.com/den-frie-vilje/hotfix/issues">github.com/den-frie-vilje/hotfix/issues</a>. This report parodies a register, not a company; Den Frie Vilje Research is not affiliated with Microsoft Research. Windows, Direct3D, Intel Core and NVIDIA GeForce are trademarks of their owners.</p>
+
+</div>
+</article>
+</body>
+</html>

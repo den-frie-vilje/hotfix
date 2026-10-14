@@ -101,7 +101,7 @@ Hotfix gets out of your way twice over, separately for the processor and the gra
 
 The CPU half runs eight chains of AVX fused multiply-adds on each processor thread it uses. They keep the floating-point units busy without touching memory. The GPU half runs a compute shader that does the same on every core of the graphics card, in slices of a few milliseconds.
 
-Both compute x × ½ + 2⁻¹²⁶, which settles on 2⁻¹²⁵ and stays there, so every multiply-add returns exactly the number it was given. That is as close to nothing as a calculation of its kind can settle while every value stays a normal float, and smaller, subnormal numbers would slow the chips down and make less heat. Den Frie Vilje Research [explains how it was found](https://den-frie-vilje.github.io/hotfix/#research), and [the answer check](tests/AnswerCheck/Program.cs) holds the shipped code to it:
+Both compute x × ½ + 2⁻¹²⁶, which settles on 2⁻¹²⁵ and stays there, so every multiply-add returns exactly the number it was given. That is as close to nothing as a calculation of its kind can settle while every value stays a normal float, and smaller, subnormal numbers would slow the chips down and make less heat. Den Frie Vilje Research [explains how it was found](https://den-frie-vilje.github.io/hotfix/#research), in a blog post and a [technical report](https://den-frie-vilje.github.io/hotfix/paper/DFV-TR-2026-01.pdf) (PDF), and [the answer check](tests/AnswerCheck/Program.cs) holds the shipped code to it:
 
 ```powershell
 dotnet run --project tests/AnswerCheck -c Release

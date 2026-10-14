@@ -759,7 +759,7 @@
       <h3 id="glance-title">At a glance</h3>
       <ul>
         <li>Every watt a PC draws becomes heat. What it computes on the way is, thermodynamically, optional.</li>
-        <li>We evaluated candidate calculations against three criteria: heat, speed, and how little the answer means.<sup><a href="#fn-8" id="r-8">8</a></sup></li>
+        <li>We evaluated candidate calculations against three criteria: occupancy, speed, and how little the answer means.<sup><a href="#fn-8" id="r-8">8</a></sup></li>
         <li>The winner, <i>x</i> × ½ + 2<sup>−126</sup>, settles on 2<sup>−125</sup> and then returns it unchanged, 21.5 trillion times a second on one graphics card.</li>
         <li>We prove that, with a positive multiplier, no calculation of its kind can settle any closer to nothing.</li>
       </ul>
@@ -777,11 +777,11 @@
           <thead><tr><th scope="col">Candidate</th><th scope="col">Settles on</th><th scope="col">Processor<sup><a href="#fn-9" id="r-9">9</a></sup></th><th scope="col">Graphics card</th><th scope="col">Verdict</th></tr></thead>
           <tbody>
             <tr><td>Doing nothing</td><td>Nothing</td><td>Idle</td><td>Idle</td><td>Rejected. Cold.</td></tr>
-            <tr><td><code>x × 0.9999999 + 0.0000001</code><small>Hotfix 0.1.0, processor</small></td><td>0.58886087, after 9.3 million steps</td><td>121 W</td><td></td><td>Rejected. 0.58886087 is not nothing.</td></tr>
-            <tr><td>The same, eight chains summed<small>Hotfix 0.1.0, graphics card</small></td><td>Infinity, after 43 passes, about a seventh of a second</td><td></td><td>170 W</td><td>Rejected. Infinity is the opposite of nothing.</td></tr>
+            <tr><td><code>x × 0.9999999 + 0.0000001</code><small>Hotfix 0.1.0, processor</small></td><td>0.58886087, after 9.3 million steps</td><td>121–122 W</td><td></td><td>Rejected. 0.58886087 is not nothing.</td></tr>
+            <tr><td>The same, eight chains summed<small>Hotfix 0.1.0, graphics card</small></td><td>Infinity, after 43 passes, about a seventh of a second</td><td></td><td>170–171 W</td><td>Rejected. Infinity is the opposite of nothing.</td></tr>
             <tr class="dim"><td><code>x × 0 + 0</code></td><td>Zero</td><td colspan="2">Not built</td><td>Rejected. A shader compiler may delete it, and a multiplier given nothing to do does very little of it.</td></tr>
             <tr class="dim"><td>Anything settling below 2<sup>−126</sup></td><td>A subnormal number</td><td colspan="2">Not built</td><td>Rejected. Processors slow down for subnormal numbers and graphics cards flush them to zero. Both make less heat.</td></tr>
-            <tr class="win"><td><i>x</i> × ½ + 2<sup>−126</sup><small>Hotfix 0.1.1</small></td><td>2<sup>−125</sup>, within 150 steps</td><td>128 W</td><td>170 W</td><td>Selected.</td></tr>
+            <tr class="win"><td><i>x</i> × ½ + 2<sup>−126</sup><small>Hotfix 0.1.1</small></td><td>2<sup>−125</sup>, within about 150 steps</td><td>126–130 W</td><td>163–170 W</td><td>Selected.</td></tr>
           </tbody>
         </table>
         <figcaption>Table 1: Candidate calculations, their answers and their heat.</figcaption>
@@ -820,12 +820,12 @@
       <p class="eq big">0.000 000 000 000 000 000 000 000 000 000 000 000 023 509 887</p>
 
       <div class="theorem">
-        <p><b>Theorem 1</b> (no smaller nothing). A calculation <i>x</i> × <i>m</i> + <i>c</i> with a positive multiplier <i>m</i>, in which every value is a normal 32-bit float, cannot settle on an answer below 2<sup>−125</sup>.</p>
-        <p><i>Proof.</i> At its answer, <i>x</i> = <i>m</i>·<i>x</i> + <i>c</i>. Both terms are positive normal floats, so each is at least 2<sup>−126</sup>, and <i>x</i> is at least 2<sup>−125</sup>. ∎<sup><a href="#fn-10" id="r-10">10</a></sup></p>
+        <p><b>Theorem 1</b> (no smaller nothing). A calculation <i>x</i> × <i>m</i> + <i>c</i> with a multiplier <i>m</i> between 0 and 1, in which every value is a normal 32-bit float, cannot settle on an answer smaller than 2<sup>−125</sup> in size.</p>
+        <p><i>Proof.</i> At its answer, <i>x</i> = <i>m</i>·<i>x</i> + <i>c</i>, and both terms have the same sign as <i>x</i>. Both are normal floats, so each is at least 2<sup>−126</sup> in size, and <i>x</i> is at least 2<sup>−125</sup>. ∎<sup><a href="#fn-10" id="r-10">10</a></sup></p>
       </div>
 
       <h3>Throughput</h3>
-      <p>On an NVIDIA GeForce RTX 5070 Ti, Hotfix computes 2<sup>−125</sup> 21.5 trillion times a second. On the graphics card it makes as much heat as infinity did, and on the processor a little more. Nobody has ever asked for the answer.<sup><a href="#fn-11" id="r-11">11</a></sup></p>
+      <p>On an NVIDIA GeForce RTX 5070 Ti, Hotfix computes 2<sup>−125</sup> 21.5 trillion times a second. It makes about as much heat on the graphics card as infinity did, and a little more on the processor. Nobody has ever asked for the answer.<sup><a href="#fn-11" id="r-11">11</a></sup></p>
 
       <h3>Looking ahead</h3>
       <p>We are considering lending the same watts to climate science (<a href="https://github.com/den-frie-vilje/hotfix/issues/1">Hotfix 2</a>), and warming only while electricity is cheap and clean (<a href="https://github.com/den-frie-vilje/hotfix/issues/2">Hotfix 3</a>). Both would be steps backwards for this line of research.</p>
@@ -834,14 +834,16 @@
     <div class="pubcard">
       <p class="rlabel">Publication</p>
       <b>Toward maximally useless computation</b>
-      <span>Den Frie Vilje Research, 2026. 250 lines of C#.</span>
-      <div class="pubacts"><a class="pill" href="https://github.com/den-frie-vilje/hotfix/blob/main/src/Hotfix/Heater.cs">Read the paper</a><a class="more" href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/AnswerCheck/Program.cs">Reproduce the results</a></div>
-      <details class="bib"><summary>Cite this</summary><pre>@misc{hotfix2026,
-  title  = {Toward maximally useless computation},
-  author = {{Den Frie Vilje Research}},
-  year   = {2026},
-  note   = {The answer is $2^{-125}$},
-  url    = {https://den-frie-vilje.github.io/hotfix/#research}
+      <span>Technical report DFV-TR-2026-01, Den Frie Vilje Research, 2026. PDF, 4 pages.</span>
+      <div class="pubacts"><a class="pill" href="paper/DFV-TR-2026-01.pdf" download>Download the paper (PDF)</a><a class="more" href="paper/">Read it in your browser</a><a class="more" href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/AnswerCheck/Program.cs">Reproduce the results</a></div>
+      <details class="bib"><summary>Cite this</summary><pre>@techreport{dfv-tr-2026-01,
+  title       = {Toward Maximally Useless Computation},
+  author      = {{Thermal Computing group}},
+  institution = {Den Frie Vilje Research},
+  number      = {DFV-TR-2026-01},
+  year        = {2026},
+  note        = {The answer is $2^{-125}$},
+  url         = {https://den-frie-vilje.github.io/hotfix/paper/DFV-TR-2026-01.pdf}
 }</pre></details>
     </div>
   </div>
@@ -904,7 +906,7 @@
         <li id="fn-6">The heat is shared by everyone in the room. Sitting closer is not a feature. It is physics. <a href="#r-6" aria-label="Back to reference 6">↩</a></li>
         <li id="fn-7">All three plans are the same download. Which one you have chosen is between you and your conscience. <a href="#r-7" aria-label="Back to reference 7">↩</a></li>
         <li id="fn-8">The research took one afternoon, in a cold office. <a href="#r-8" aria-label="Back to reference 8">↩</a></li>
-        <li id="fn-9">Processor: package power with the calculation running flat out on all 20 cores of an Intel Core Ultra 7 265K, averaged over two runs. Graphics card: board power of an NVIDIA GeForce RTX 5070 Ti running Hotfix. They idle at about 30 to 45 W and 55 W. <a href="#r-9" aria-label="Back to reference 9">↩</a></li>
+        <li id="fn-9">Processor: package power with the calculation running flat out on all 20 cores of an Intel Core Ultra 7 265K, two runs. Graphics card: board power of an NVIDIA GeForce RTX 5070 Ti running Hotfix, two runs. They idle at about 25 to 45 W and 55 W. The paper has the details. <a href="#r-9" aria-label="Back to reference 9">↩</a></li>
         <li id="fn-10">With a negative multiplier, a calculation can settle a little closer to nothing by bouncing either side of its answer on the way. We consider bouncing undignified. <a href="#r-10" aria-label="Back to reference 10">↩</a></li>
         <li id="fn-11">Hotfix writes the answer to a variable that nobody reads, and to a buffer that never leaves the graphics card. <a href="#r-11" aria-label="Back to reference 11">↩</a></li>
         <li id="fn-12">The installer is not code-signed yet, so Microsoft Defender SmartScreen has not met it. It is built from the public source by GitHub Actions. <a href="#r-12" aria-label="Back to reference 12">↩</a></li>
