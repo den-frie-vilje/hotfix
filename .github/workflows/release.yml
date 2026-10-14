@@ -1,0 +1,32 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Tag matches the project version
+        shell: pwsh
+        run: |
+          $version = ([xml](Get-Content src/Hotfix/Hotfix.csproj)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if ("v$version" -ne "${{ github.ref_name }}") { throw "tag ${{ github.ref_name }} does not match <Version>$version</Version>" }
+          "VERSION=$version" >> $env:GITHUB_ENV
+      - name: Publish
+        run: dotnet publish src/Hotfix -c Release -r win-x64 --self-contained -o publish
+      - name: Package the installer
+        run: |
+          dotnet tool install -g vpk --version 1.2.161
+          vpk pack --packId Hotfix --packVersion ${{ env.VERSION }} --packDir publish --mainExe Hotfix.exe --packTitle Hotfix --packAuthors "Den Frie Vilje ApS" --icon src/Hotfix/hotfix.ico --shortcuts StartMenuRoot --outputDir releases
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create ${{ github.ref_name }} releases/* --title "Hotfix ${{ env.VERSION }}" --notes-from-tag

@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hotfix for Windows | Warmth from the PC you already have | Den Frie Vilje</title>
+<meta name="description" content="Hotfix turns the CPU and GPU time your PC isn't using into heat for the room, and steps aside while you work. Den Frie Vilje's first Windows release. Free.">
+<link rel="canonical" href="https://den-frie-vilje.github.io/hotfix/">
+<meta name="theme-color" content="#1b1b1b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hotfix. It's warmer on Windows.">
+<meta property="og:description" content="Den Frie Vilje's first Windows release turns your PC's idle CPU and GPU time into heat for the room. Free.">
+<meta property="og:url" content="https://den-frie-vilje.github.io/hotfix/">
+<meta property="og:image" content="https://den-frie-vilje.github.io/hotfix/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Four glass radiator fins glowing red, orange, amber and yellow against a winter night, under the words: It's warmer on Windows.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect x='8' y='16' width='48' height='224' rx='24' fill='%23C42B1C'/%3E%3Crect x='72' y='16' width='48' height='224' rx='24' fill='%23E8590C'/%3E%3Crect x='136' y='16' width='48' height='224' rx='24' fill='%23F59F00'/%3E%3Crect x='200' y='16' width='48' height='224' rx='24' fill='%23FCC419'/%3E%3C/svg%3E">
+<style>
+  /* Register: Microsoft's 2026 flagship product pages (Windows 11, Surface Laptop, Microsoft 365), measured live:
+     Segoe at weight 350, a 54px dark header, blue pills, black and warm-paper bands. The arc is a temperature:
+     the page starts on a winter night and warms as it scrolls. */
+  @property --heat { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+  :root {
+    --font: "Segoe UI Variable Text", "Segoe UI", "Segoe Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --display: "Segoe UI Variable Display", "Segoe UI", "Segoe Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --night: #03050b;
+    --ink: #1b1b1b;
+    --paper: #f5f3ef;
+    --mist: #f2f2f2;
+    --grey: #616161;
+    --grey-d: #a8adb7;
+    --rule: #d6d6d6;
+    --rule-d: #2b2f38;
+    --blue: #0078d4;
+    --blue-h: #106ebe;
+    --blue-store: #0067b8;
+    --h1: #c42b1c; --h2: #e8590c; --h3: #f59f00; --h4: #fcc419;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+    --wrap: 1180px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 70px; }
+  body { font: 350 16px/1.5 var(--font); letter-spacing: -.02em; color: #fff; background: var(--night); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+  img, svg { display: block; max-width: 100%; }
+  a { color: inherit; }
+  button { font: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  sup { font-size: .6em; line-height: 0; vertical-align: super; }
+  sup a { text-decoration: none; padding: 0 .1em; }
+  sup a:hover { text-decoration: underline; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  .skip { position: absolute; left: -9999px; top: 8px; z-index: 100; background: #fff; color: #000; padding: 8px 14px; border-radius: 4px; }
+  .skip:focus { left: 8px; }
+  :focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
+  .light :focus-visible { outline-color: #000; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 350; letter-spacing: -.02em; text-wrap: balance; }
+  p { text-wrap: pretty; }
+
+  /* buttons and links, as measured: 12px 20px pills, Segoe 350 */
+  .pill { display: inline-flex; align-items: center; gap: 8px; background: var(--blue); color: #fff; border-radius: 999px; padding: 12px 22px; text-decoration: none; font-weight: 400; transition: background .15s; white-space: nowrap; }
+  .pill:hover { background: var(--blue-h); }
+  .pill.sm { padding: 6px 14px; font-size: 14px; }
+  .pill.ghost { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.55); }
+  .pill.ghost:hover { background: rgba(255,255,255,.1); }
+  .more { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-weight: 400; color: #8cc8ff; }
+  .light .more { color: var(--blue-store); }
+  .more::after { content: ""; width: 7px; height: 7px; border: solid currentColor; border-width: 1.5px 1.5px 0 0; transform: rotate(45deg); margin-left: 2px; }
+  .more:hover { text-decoration: underline; }
+
+  /* global header, after the 54px #1b1b1b bar every Microsoft property shares */
+  .uhf { position: sticky; top: 0; z-index: 50; height: 54px; background: #1b1b1b; border-bottom: 1px solid #2b2b2b; }
+  .uhf .wrap { max-width: 1600px; height: 100%; display: flex; align-items: center; gap: 22px; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; font-weight: 600; font-size: 17px; letter-spacing: -.03em; white-space: nowrap; }
+  .brand svg { width: 22px; height: 22px; }
+  .uhf .bar { width: 1px; height: 24px; background: #6b6b6b; }
+  .uhf .product { font-weight: 600; font-size: 17px; text-decoration: none; letter-spacing: -.02em; white-space: nowrap; }
+  .uhf nav { display: flex; gap: 4px; font-size: 13px; }
+  .uhf nav a, .uhf summary { text-decoration: none; padding: 6px 9px; border-radius: 4px; color: #e6e6e6; list-style: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .uhf nav a:hover, .uhf summary:hover { background: #2d2d2d; }
+  .uhf summary::-webkit-details-marker { display: none; }
+  .chev { width: 8px; height: 8px; border: solid currentColor; border-width: 0 1.3px 1.3px 0; transform: rotate(45deg) translate(-2px, -2px); transition: transform .2s var(--ease); }
+  details[open] > summary .chev { transform: rotate(225deg) translate(-2px, -2px); }
+  .drop { position: relative; }
+  .drop .menu { position: absolute; top: calc(100% + 10px); left: 0; min-width: 280px; background: #2b2b2b; border: 1px solid #3b3b3b; border-radius: 8px; padding: 6px; box-shadow: 0 16px 40px rgba(0,0,0,.5); font-size: 14px; }
+  .drop.right .menu { left: auto; right: 0; }
+  .drop .menu a { display: block; padding: 9px 12px; border-radius: 4px; text-decoration: none; }
+  .drop .menu a:hover { background: #3a3a3a; }
+  .drop .menu small { display: block; color: #a8a8a8; font-size: 12px; }
+  .drop .menu p { padding: 9px 12px 4px; color: #a8a8a8; font-size: 12px; }
+  .uhf .end { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  @media (max-width: 900px) { .uhf nav, .uhf .end .drop { display: none; } .uhf .end { margin-left: auto; } }
+  @media (max-width: 520px) { .uhf .bar, .uhf .product { display: none; } }
+
+  /* the purchase pill that rides along once the hero has gone, as on Surface pages */
+  .buybar { position: fixed; top: 66px; right: 24px; z-index: 40; display: flex; align-items: center; gap: 14px; padding: 6px 6px 6px 18px; border-radius: 999px; background: rgba(30, 30, 34, .72); -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%); box-shadow: 0 8px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.1); font-size: 13px; line-height: 1.2; transform: translateY(-14px); opacity: 0; pointer-events: none; transition: opacity .25s var(--ease), transform .25s var(--ease); }
+  .buybar b { font-weight: 600; display: block; }
+  .buybar.show { opacity: 1; transform: none; pointer-events: auto; }
+  @media (max-width: 700px) { .buybar { display: none; } }
+
+  /* hero: pinned for a while, the fins heat with the scroll */
+  .hero { height: 190vh; position: relative; background: var(--night); }
+  .hero .stage { position: sticky; top: 54px; height: calc(100vh - 54px); height: calc(100svh - 54px); overflow: hidden; display: grid; place-items: center; text-align: center; }
+  .hero .sky { position: absolute; inset: 0; background:
+      radial-gradient(70% 55% at 50% 100%, color-mix(in oklab, #1d3f7a calc(100% - var(--heat) * 100%), #a33a10) 0%, transparent 70%),
+      radial-gradient(120% 80% at 50% 0%, #0a1122 0%, var(--night) 60%); }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: calc(1 - var(--heat) * 1.1); }
+  .hero .stage::after { content: ""; position: absolute; inset: auto 0 0 0; height: 14%; background: linear-gradient(transparent, var(--night)); z-index: 3; pointer-events: none; }
+  .hero .copy { position: relative; z-index: 2; padding: 0 24px; margin-top: -2vh; }
+  .eyebrow { font-size: 18px; font-weight: 600; letter-spacing: -.01em; color: #cfd6e4; }
+  .hero h1 { font-size: clamp(44px, 7vw, 88px); line-height: 1.04; font-weight: 600; letter-spacing: -.035em; margin-top: 8px; }
+  .hero .lede { max-width: 600px; margin: 18px auto 0; font-size: clamp(17px, 1.6vw, 20px); color: #d6dbe5; }
+  .hero .cta { display: flex; gap: 26px; justify-content: center; align-items: center; margin-top: 28px; flex-wrap: wrap; }
+  .hero .fine { margin-top: 16px; font-size: 13px; color: #8d95a5; }
+  .fins { position: relative; z-index: 1; display: flex; gap: clamp(12px, 2.2vw, 26px); height: clamp(170px, 30vh, 300px); margin-top: 5vh; justify-content: center; }
+  .fin { --lvl: clamp(0, var(--heat) * 1.45 - var(--i) * .15, 1); position: relative; width: clamp(36px, 4.6vw, 62px); border-radius: 999px; overflow: hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.05) 40%, rgba(255,255,255,.08));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), inset 0 2px 0 rgba(255,255,255,.3), 0 0 calc(var(--lvl) * 70px) calc(var(--lvl) * 6px) color-mix(in oklab, var(--c) calc(var(--lvl) * 65%), transparent);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  .fin::before { content: ""; position: absolute; inset: auto 0 0 0; height: calc(var(--lvl) * 100%); background: linear-gradient(0deg, var(--c), color-mix(in oklab, var(--c) 55%, #fff6e0)); border-radius: 999px; }
+  .fin::after { content: ""; position: absolute; top: 6%; left: 22%; width: 18%; height: 40%; border-radius: 999px; background: linear-gradient(180deg, rgba(255,255,255,.55), transparent); }
+  .fin:nth-child(1) { --c: var(--h1); --i: 0; } .fin:nth-child(2) { --c: var(--h2); --i: 1; } .fin:nth-child(3) { --c: var(--h3); --i: 2; } .fin:nth-child(4) { --c: var(--h4); --i: 3; }
+  .hero .floor { position: absolute; left: 50%; bottom: 0; width: 140vw; height: 22vh; transform: translateX(-50%); background: radial-gradient(50% 100% at 50% 100%, color-mix(in oklab, transparent, #e8590c calc(var(--heat) * 28%)), transparent 70%); }
+  .scrollhint { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #7d8596; opacity: calc(1 - var(--heat) * 3); }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      :root { animation: warm linear both; animation-timeline: scroll(root block); animation-range: 0 85vh; }
+    }
+  }
+  @keyframes warm { to { --heat: 1; } }
+  @media (prefers-reduced-motion: reduce) { :root { --heat: .8; } .hero { height: auto; } .hero .stage { position: relative; top: 0; height: auto; min-height: 640px; padding: 80px 0; } }
+
+  /* the statement that lights up as it passes, after "The Windows difference" */
+  .statement { background: var(--night); padding: 8vh 0 18vh; }
+  .statement p { font: 600 clamp(30px, 4.4vw, 60px)/1.12 var(--display); letter-spacing: -.03em; max-width: 1050px;
+    background: linear-gradient(180deg, #fff 0 45%, rgba(255,255,255,.16) 55% 100%); background-size: 100% 220%; background-position: 0 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .statement p .warm { background: linear-gradient(90deg, var(--h2), var(--h4)); -webkit-background-clip: text; background-clip: text; }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .statement p { animation: fill linear both; animation-timeline: view(); animation-range: entry 60% cover 55%; }
+    }
+  }
+  @keyframes fill { to { background-position: 0 0; } }
+  @supports not (animation-timeline: view()) { .statement p { background-position: 0 0; } }
+  @media (prefers-reduced-motion: reduce) { .statement p { background-position: 0 0; } }
+
+  /* reveals, scroll-driven, from a visible resting state */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .rv { animation: rise linear both; animation-timeline: view(); animation-range: entry 5% entry 55%; }
+    }
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(36px); } }
+
+  section { padding: 120px 0; }
+  .center { text-align: center; }
+  .h2 { font-size: clamp(34px, 4.2vw, 48px); line-height: 1.1; }
+  .sub { font-size: 18px; color: var(--grey-d); max-width: 640px; margin-top: 14px; }
+  .center .sub { margin-left: auto; margin-right: auto; }
+  .light { background: #fff; color: var(--ink); }
+  .light .sub { color: var(--grey); }
+  .paper { background: var(--paper); color: var(--ink); }
+  .paper .sub { color: var(--grey); }
+
+  /* the difference: an exclusive accordion on the left, its picture on the right */
+  .diffsec { background: linear-gradient(180deg, var(--night), #070b16 40%, #0b1020); }
+  .diff { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; margin-top: 56px; align-items: center; }
+  .diff details { border-top: 1px solid var(--rule-d); }
+  .diff details:last-child { border-bottom: 1px solid var(--rule-d); }
+  .diff summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 26px 4px; font-size: 20px; font-weight: 600; color: #8a92a3; transition: color .2s; }
+  .diff summary::-webkit-details-marker { display: none; }
+  .diff summary:hover, .diff details[open] summary { color: #fff; }
+  .diff details p { padding: 0 4px 26px; color: #c3c9d4; font-size: 17px; max-width: 46ch; }
+  .diff details[open] p { animation: open .35s var(--ease); }
+  @keyframes open { from { opacity: 0; transform: translateY(-6px); } }
+  .views { position: relative; aspect-ratio: 4 / 3; border-radius: 24px; overflow: hidden; background: #10141f; box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
+  .views .v { display: none; position: absolute; inset: 0; animation: open .45s var(--ease); }
+  .diff:has(details[data-v="1"][open]) .v[data-v="1"], .diff:not(:has(details[open])) .v[data-v="1"],
+  .diff:has(details[data-v="2"][open]) .v[data-v="2"], .diff:has(details[data-v="3"][open]) .v[data-v="3"],
+  .diff:has(details[data-v="4"][open]) .v[data-v="4"], .diff:has(details[data-v="5"][open]) .v[data-v="5"] { display: block; }
+  @media (max-width: 860px) { .diff { grid-template-columns: 1fr; gap: 28px; } .views { order: -1; } }
+
+  /* view 1: a desktop corner with the real menu */
+  .desk { position: absolute; inset: 0; background: radial-gradient(80% 90% at 75% 110%, #e8590c 0%, #8a2410 35%, #2a0d16 65%, #120a1c 100%); }
+  .desk::before { content: ""; position: absolute; width: 70%; aspect-ratio: 1; right: -12%; bottom: -30%; border-radius: 50%; background: radial-gradient(circle, rgba(252,196,25,.55), transparent 60%); filter: blur(30px); }
+  .taskbar { position: absolute; left: 0; right: 0; bottom: 0; height: 12%; min-height: 44px; background: rgba(28,28,30,.86); -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; justify-content: flex-end; gap: clamp(6px, 1.4vw, 14px); padding: 0 16px; font-size: clamp(10px, 1vw, 12px); color: #fff; }
+  .taskbar .ti { width: clamp(14px, 1.6vw, 18px); height: clamp(14px, 1.6vw, 18px); color: #fff; }
+  .taskbar .hot { padding: 5px; border-radius: 4px; background: rgba(255,255,255,.1); }
+  .taskbar .clock { text-align: right; line-height: 1.3; margin-left: 4px; }
+  .winmenu { position: absolute; right: 13%; bottom: 14.5%; width: min(64%, 360px); background: #2c2c2c; border: 1px solid #3f3f3f; border-radius: 8px; padding: 4px; box-shadow: 0 18px 50px rgba(0,0,0,.55); font: 400 clamp(11px, 1.15vw, 14px)/1 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; letter-spacing: 0; color: #fff; text-align: left; }
+  .winmenu li { list-style: none; display: block; padding: .72em .9em .72em 2.4em; border-radius: 4px; position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .winmenu li.on::before { content: ""; position: absolute; left: 1em; top: 50%; width: .42em; height: .78em; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: translateY(-62%) rotate(45deg); }
+  .winmenu li.hl { background: #3d3d3d; }
+  .winmenu hr { border: 0; border-top: 1px solid #454545; margin: 4px 2px; }
+  .winmenu u { text-decoration: none; }
+
+  /* view 2: heat against work */
+  .chart { position: absolute; inset: 0; padding: 7% 7% 9%; display: flex; flex-direction: column; background: #0d1220; }
+  .chart .key { display: flex; gap: 20px; font-size: 13px; color: #c3c9d4; }
+  .chart .key span::before { content: ""; display: inline-block; width: 18px; height: 3px; border-radius: 2px; margin-right: 8px; vertical-align: middle; background: var(--k); }
+  .chart svg { flex: 1; width: 100%; margin-top: 18px; overflow: visible; }
+
+  /* view 3: two gauges */
+  .gauges { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 8%; background: #0d1220; align-content: center; }
+  .gauge { border-radius: 18px; background: #161c2b; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); padding: 26px 22px; text-align: center; }
+  .gauge svg { width: 46%; margin: 0 auto 18px; }
+  .gauge b { display: block; font: 600 clamp(28px, 3.4vw, 44px)/1 var(--display); letter-spacing: -.03em; }
+  .gauge span { display: block; margin-top: 8px; color: #a8adb7; font-size: 14px; }
+
+  /* view 4: nothing sent */
+  .zero { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; background: radial-gradient(60% 60% at 50% 40%, #1b2440, #0d1220); }
+  .zero b { font: 600 clamp(110px, 16vw, 200px)/.9 var(--display); letter-spacing: -.05em; background: linear-gradient(180deg, #fff, #8a92a3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .zero p { color: #c3c9d4; margin-top: 14px; }
+
+  /* view 5: from three dots to three buttons */
+  .chrome { position: absolute; inset: 0; display: grid; place-items: center; background: #0d1220; }
+  .window { width: 74%; aspect-ratio: 16 / 10; border-radius: 10px; background: #f5f3ef; box-shadow: 0 30px 70px rgba(0,0,0,.6); overflow: hidden; color: var(--ink); }
+  .window .tb { height: 15%; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 4%; background: #fff; border-bottom: 1px solid #e3e3e3; font-size: clamp(10px, 1.1vw, 13px); }
+  .lights { display: flex; gap: 7px; animation: lights 3.2s .6s var(--ease) both; }
+  .lights i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; } .lights i + i { background: #febc2e; } .lights i + i + i { background: #28c840; }
+  .caps { display: flex; height: 100%; animation: caps 3.2s .6s var(--ease) both; }
+  .caps i { width: clamp(30px, 4vw, 46px); display: grid; place-items: center; }
+  .caps i svg { width: 10px; height: 10px; }
+  .caps i:last-child:hover { background: #c42b1c; color: #fff; }
+  .window .body { padding: 8% 6%; }
+  .window .body b { display: block; font: 600 clamp(18px, 2.4vw, 30px)/1.1 var(--display); letter-spacing: -.03em; }
+  .window .body span { display: block; color: var(--grey); margin-top: 6px; font-size: clamp(11px, 1.2vw, 15px); }
+  @keyframes lights { 0%, 30% { opacity: 1; transform: none; } 55%, 100% { opacity: 0; transform: translateX(-10px) scale(.6); } }
+  @keyframes caps { 0%, 45% { opacity: 0; transform: translateX(14px); } 75%, 100% { opacity: 1; transform: none; } }
+
+  /* say hello to warmth: one glyph, one huge light line */
+  .hello { background: radial-gradient(90% 70% at 50% 110%, #5a1f0b 0%, #1a0f1f 45%, #0b1020 75%); text-align: center; padding: 150px 0 140px; }
+  .hello h2 { font-size: clamp(48px, 7.4vw, 92px); line-height: 1.02; letter-spacing: -.035em; }
+  .tile { width: 112px; height: 112px; margin: 54px auto 40px; border-radius: 26px; background: linear-gradient(160deg, #2c3348, #1a1f2e); box-shadow: 0 20px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12); display: grid; place-items: center; position: relative; }
+  .tile svg { width: 56px; height: 56px; }
+  .tile .ok { position: absolute; right: -8px; top: -8px; width: 30px; height: 30px; border-radius: 50%; background: #13a10e; display: grid; place-items: center; box-shadow: 0 0 0 4px #1a1220; }
+  .tile .ok svg { width: 14px; height: 14px; }
+  .hello p { max-width: 520px; margin: 0 auto 30px; color: #d6dbe5; font-size: 17px; }
+
+  /* Task Manager, after the Windows 11 app: dark, left rail, heat-shaded cells */
+  .tmsec { background: #000; }
+  .tm { margin: 56px auto 0; max-width: 1040px; border-radius: 10px; overflow: hidden; background: #202020; box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 0 1px #3a3a3a; font: 400 13px/1.3 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; letter-spacing: 0; color: #fff; text-align: left; }
+  .tm .title { height: 44px; display: flex; align-items: center; gap: 10px; padding-left: 14px; background: #202020; }
+  .tm .title svg { width: 16px; height: 16px; }
+  .tm .search { margin: 0 auto; width: min(46%, 420px); height: 30px; border-radius: 4px; background: #2d2d2d; border-bottom: 1px solid #8a8a8a; color: #9a9a9a; display: flex; align-items: center; padding: 0 12px; font-size: 12px; }
+  .tm .caps2 { display: flex; height: 100%; }
+  .tm .caps2 i { width: 46px; display: grid; place-items: center; }
+  .tm .caps2 svg { width: 10px; height: 10px; }
+  .tm .inner { display: grid; grid-template-columns: 48px 1fr; min-height: 420px; }
+  .tm .rail { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 6px; }
+  .tm .rail i { width: 36px; height: 34px; border-radius: 4px; display: grid; place-items: center; color: #cfcfcf; }
+  .tm .rail i.on { background: #2d2d2d; position: relative; }
+  .tm .rail i.on::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 3px; border-radius: 2px; background: #60cdff; }
+  .tm .rail svg { width: 16px; height: 16px; }
+  .tm .pane { background: #272727; border-top-left-radius: 8px; padding: 16px 0 0; overflow-x: auto; }
+  .tm .head { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 14px; gap: 16px; }
+  .tm .head h3 { font: 600 20px/1 "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; letter-spacing: 0; }
+  .tm .tools { display: flex; gap: 6px; color: #cfcfcf; font-size: 12px; }
+  .tm .tools span { padding: 6px 10px; border-radius: 4px; }
+  .tm .tools span.dim { color: #777; }
+  .tm table { width: 100%; min-width: 720px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .tm th { font-weight: 400; color: #cfcfcf; text-align: right; padding: 4px 12px 8px; font-size: 12px; vertical-align: bottom; border-bottom: 1px solid #333; }
+  .tm th b { display: block; font-size: 15px; font-weight: 600; color: #fff; }
+  .tm th:first-child, .tm td:first-child { text-align: left; padding-left: 20px; }
+  .tm th.st, .tm td.st { text-align: left; }
+  .tm td { padding: 9px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid #2c2c2c; background: rgba(255, 166, 0, calc(var(--u, 0) * .5)); transition: background .4s; }
+  .tm td:first-child { background: none; }
+  .tm .grp td { background: none; color: #cfcfcf; font-size: 12px; padding-top: 14px; }
+  .tm .name { display: flex; align-items: center; gap: 10px; }
+  .tm .name svg, .tm .name .ico { width: 18px; height: 18px; flex: none; }
+  .tm .ico { border-radius: 4px; display: grid; place-items: center; font-size: 10px; font-weight: 700; }
+  .tm td.st { color: #9ec9ff; }
+  .demo { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .toggle { border-radius: 999px; padding: 11px 20px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); font-weight: 400; transition: background .15s; }
+  .toggle:hover { background: rgba(255,255,255,.08); }
+  .toggle[aria-pressed="true"] { background: #fff; color: #000; box-shadow: none; }
+  .readout { margin-top: 18px; color: #a8adb7; font-size: 14px; min-height: 1.5em; }
+  .tmnote { margin-top: 10px; color: #6f7684; font-size: 12px; }
+
+  /* versus: one glowing column, as on the Windows page */
+  .vs { background: #000; padding-top: 40px; }
+  .vsgrid { display: grid; grid-template-columns: 1.1fr 1.3fr 1.3fr; gap: 0 18px; margin: 56px auto 0; max-width: 980px; }
+  .vsgrid .colhead { padding: 0 22px 16px; font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .vsgrid .colhead svg { width: 16px; height: 16px; }
+  .vsgrid .colhead.dim { color: #a8adb7; }
+  .vsgrid .rowhead { display: flex; align-items: center; gap: 10px; padding: 22px 0; border-top: 1px solid var(--rule-d); color: #e6e8ee; font-weight: 600; font-size: 15px; }
+  .vsgrid .rowhead svg { width: 18px; height: 18px; color: #a8adb7; flex: none; }
+  .vsgrid .cell { padding: 22px; font-size: 15px; text-align: left; }
+  .vsgrid .us { background: linear-gradient(180deg, #e8590c, #c42b1c); color: #fff; }
+  .vsgrid .them { background: #1d2230; color: #c3c9d4; }
+  .vsgrid .us.first, .vsgrid .them.first { border-radius: 16px 16px 0 0; }
+  .vsgrid .us.last, .vsgrid .them.last { border-radius: 0 0 16px 16px; }
+  .vscol { display: contents; }
+  .glow { position: relative; }
+  .vsgrid { position: relative; }
+  .vsgrid::before { content: ""; position: absolute; left: 32%; width: 34%; top: 30px; bottom: -20px; background: radial-gradient(50% 50% at 50% 50%, rgba(232,89,12,.55), transparent 70%); filter: blur(40px); z-index: 0; }
+  .vsgrid > * { position: relative; z-index: 1; }
+  @media (max-width: 760px) { .vsgrid { grid-template-columns: 1fr 1fr; } .vsgrid .rowhead { grid-column: 1 / -1; border-top: 0; padding-bottom: 8px; } .vsgrid .spacer { display: none; } .vsgrid::before { left: 0; width: 50%; } .vsgrid .us, .vsgrid .them { border-radius: 12px !important; } }
+
+  /* plans, after the Microsoft 365 compare page */
+  .plans { background: #fff; color: var(--ink); }
+  .plans .h2 { font-size: clamp(30px, 3.4vw, 40px); font-weight: 600; }
+  .billing { display: inline-flex; margin-top: 24px; padding: 3px; border-radius: 6px; background: #f0f0f0; box-shadow: inset 0 0 0 1px #d1d1d1; }
+  .billing input { position: absolute; opacity: 0; pointer-events: none; }
+  .billing label { padding: 6px 16px; border-radius: 4px; font-size: 14px; cursor: pointer; color: #424242; }
+  .billing input:checked + label { background: #fff; color: #000; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.15), inset 0 0 0 1px #c6c6c6; }
+  .billing input:focus-visible + label { outline: 2px solid #000; outline-offset: 2px; }
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 40px; text-align: left; }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr; max-width: 520px; margin-left: auto; margin-right: auto; } }
+  .card { border-radius: 8px; padding: 28px 26px 30px; background: #fff; box-shadow: 0 0 0 1px #e1e1e1, 0 6px 18px rgba(0,0,0,.06); display: flex; flex-direction: column; }
+  .badge { align-self: flex-start; background: #ffc83d; color: #000; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 2px; margin-bottom: 14px; }
+  .card h3 { font: 600 24px/1.2 var(--display); letter-spacing: -.02em; }
+  .price { font-size: 20px; margin-top: 6px; }
+  .price .m { display: none; }
+  .plans:has(#monthly:checked) .price .y { display: none; }
+  .plans:has(#monthly:checked) .price .m { display: inline; }
+  .apps { display: flex; gap: 6px; margin: 16px 0 18px; }
+  .apps span { width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; color: #fff; font: 700 10px/1 var(--font); letter-spacing: 0; }
+  .card .incl { font-weight: 600; font-size: 14px; border-top: 1px solid #e1e1e1; padding-top: 16px; }
+  .card ul { list-style: none; margin-top: 10px; font-size: 14px; flex: 1; }
+  .card li { padding: 5px 0 5px 24px; position: relative; }
+  .card li::before { content: ""; position: absolute; left: 4px; top: 10px; width: 5px; height: 9px; border: solid #107c10; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .card .buy { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .card .buy .pill { background: var(--blue-store); }
+  .card .buy .pill:hover { background: #005da6; }
+
+  /* specs, after Surface's tech specs: label, value, rule */
+  .specs { margin-top: 48px; border-top: 1px solid var(--rule); }
+  .spec { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--rule); font-size: 16px; }
+  .spec dt { font-weight: 600; }
+  .spec dd { color: #3b3b3b; }
+  .spec dd small { display: block; color: var(--grey); font-size: 14px; margin-top: 4px; }
+  @media (max-width: 700px) { .spec { grid-template-columns: 1fr; gap: 4px; } }
+
+  /* the KB article, after support pages: white, narrow, breadcrumbs, applies-to chips */
+  .kb { background: var(--mist); color: var(--ink); }
+  .article { max-width: 820px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 0 0 1px #e6e6e6; padding: 44px 52px 40px; }
+  @media (max-width: 700px) { .article { padding: 28px 20px; } }
+  .crumbs { font-size: 13px; color: var(--grey); }
+  .crumbs a { color: var(--blue-store); text-decoration: none; }
+  .article h2 { font: 600 32px/1.2 var(--display); letter-spacing: -.02em; margin-top: 14px; }
+  .applies { margin-top: 18px; font-size: 13px; color: var(--grey); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .applies span { background: #f0f0f0; border-radius: 4px; padding: 3px 8px; color: #3b3b3b; }
+  .article h3 { font: 600 20px/1.3 var(--display); letter-spacing: -.01em; margin-top: 30px; }
+  .article p, .article ol { margin-top: 10px; color: #303030; letter-spacing: -.01em; }
+  .article ol { padding-left: 1.3em; }
+  .article li { margin-top: 6px; }
+  .article code { font: 14px ui-monospace, "Cascadia Mono", Consolas, monospace; background: #f3f3f3; padding: 1px 5px; border-radius: 3px; }
+  .article a { color: var(--blue-store); }
+  .helpful { margin-top: 34px; padding-top: 22px; border-top: 1px solid #e6e6e6; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 14px; }
+  .helpful button { border-radius: 4px; padding: 5px 16px; box-shadow: inset 0 0 0 1px #8a8a8a; color: var(--ink); }
+  .helpful button:hover { background: #f3f3f3; }
+  .helpful output { color: var(--grey); }
+
+  /* FAQ, after the Windows page: rounded rows, chevrons, expand all */
+  .faq { background: var(--paper); color: var(--ink); }
+  .faqtools { display: flex; gap: 14px; justify-content: center; margin-top: 20px; font-size: 14px; }
+  .faqtools button { color: var(--blue-store); display: inline-flex; gap: 6px; align-items: center; }
+  .faqtools button:hover { text-decoration: underline; }
+  .qs { max-width: 860px; margin: 40px auto 0; display: grid; gap: 10px; }
+  .qs details { background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #e4e0d8; }
+  .qs summary { list-style: none; cursor: pointer; padding: 20px 24px; display: flex; justify-content: space-between; gap: 16px; align-items: center; font-weight: 600; font-size: 17px; }
+  .qs summary::-webkit-details-marker { display: none; }
+  .qs details > div { padding: 0 24px 22px; color: #3b3b3b; max-width: 70ch; }
+  .qs details > div p + p { margin-top: 10px; }
+
+  /* footnotes card, then the legal line */
+  .notes { background: var(--paper); color: var(--grey); padding: 0 0 80px; font-size: 13px; }
+  .notes .box { max-width: 1020px; margin: 0 auto; background: #ece8e1; border-radius: 12px; padding: 26px 30px; }
+  .notes ol { padding-left: 1.4em; display: grid; gap: 7px; }
+  .notes p { margin-top: 16px; }
+  .notes a { color: var(--blue-store); }
+
+  /* footer, after the light microsoft.com footer: six columns, then the legal row */
+  footer { background: var(--mist); color: var(--grey); font-size: 12px; padding: 40px 0 96px; }
+  .cols { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
+  @media (max-width: 900px) { .cols { grid-template-columns: repeat(2, 1fr); } }
+  .cols h4 { color: var(--ink); font-size: 15px; font-weight: 600; margin-bottom: 12px; letter-spacing: -.01em; }
+  .cols ul { list-style: none; display: grid; gap: 10px; }
+  .cols a { text-decoration: none; }
+  .cols a:hover, .legal a:hover { text-decoration: underline; }
+  .legal { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; margin-top: 40px; }
+  .legal a { text-decoration: none; }
+  .legal .lang { display: flex; align-items: center; gap: 8px; margin-right: auto; }
+  .legal svg { width: 16px; height: 16px; }
+  .legal .choices { display: flex; align-items: center; gap: 6px; }
+  .legal .choices svg { width: 30px; }
+
+  /* the assistant bubble, after "Need help? Let's chat" */
+  .chatbtn { position: fixed; right: 20px; bottom: 20px; z-index: 60; display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 8px; border-radius: 999px; background: var(--blue-store); color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.35); font-size: 14px; font-weight: 600; text-align: left; line-height: 1.15; }
+  .chatbtn small { display: block; font-weight: 400; font-size: 12px; opacity: .9; }
+  .chatbtn .av { width: 34px; height: 34px; border-radius: 50%; background: #fff; display: grid; place-items: center; }
+  .chatbtn .av svg { width: 18px; height: 18px; }
+  .chat { position: fixed; inset: auto 20px 84px auto; margin: 0; width: min(340px, calc(100vw - 40px)); border: 0; border-radius: 12px; background: #fff; color: var(--ink); box-shadow: 0 24px 60px rgba(0,0,0,.35); padding: 0; overflow: hidden; }
+  .chat header { background: var(--blue-store); color: #fff; padding: 14px 18px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .chat header button { width: 28px; height: 28px; border-radius: 4px; display: grid; place-items: center; }
+  .chat header button:hover { background: rgba(255,255,255,.15); }
+  .chat .msg { margin: 18px; padding: 12px 14px; border-radius: 12px 12px 12px 4px; background: #f0f0f0; font-size: 15px; }
+  .chat .acts { display: flex; flex-direction: column; gap: 8px; padding: 0 18px 18px; }
+  .chat .acts a, .chat .acts button { text-align: center; border-radius: 999px; padding: 9px 14px; font-size: 14px; }
+  .chat .acts a { background: var(--blue-store); color: #fff; text-decoration: none; }
+  .chat .acts button { box-shadow: inset 0 0 0 1px #8a8a8a; }
+  .chat:popover-open { animation: open .2s var(--ease); }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="fins" viewBox="0 0 256 256"><rect x="8" y="16" width="48" height="224" rx="24" fill="#C42B1C"/><rect x="72" y="16" width="48" height="224" rx="24" fill="#E8590C"/><rect x="136" y="16" width="48" height="224" rx="24" fill="#F59F00"/><rect x="200" y="16" width="48" height="224" rx="24" fill="#FCC419"/></symbol>
+  </defs>
+</svg>
+
+<header class="uhf">
+  <div class="wrap">
+    <a class="brand" href="https://denfrievilje.dk"><svg aria-hidden="true"><use href="#fins"/></svg>Den Frie Vilje</a>
+    <span class="bar" aria-hidden="true"></span>
+    <a class="product" href="#top">Discover Hotfix</a>
+    <nav aria-label="Hotfix">
+      <a href="#get">Get Hotfix</a>
+      <a href="#versus">Compare</a>
+      <a href="#kb">Help and support</a>
+      <details class="drop"><summary>More <span class="chev" aria-hidden="true"></span></summary>
+        <div class="menu">
+          <a href="https://github.com/den-frie-vilje/hotfix/releases">Release notes</a>
+          <a href="https://github.com/den-frie-vilje/hotfix">Source code</a>
+          <a href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/YieldCheck/Program.cs">The yield check</a>
+        </div>
+      </details>
+    </nav>
+    <div class="end">
+      <details class="drop right"><summary>All Den Frie Vilje <span class="chev" aria-hidden="true"></span></summary>
+        <div class="menu">
+          <p>For Windows</p>
+          <a href="#top">Hotfix<small>Our first Windows release. You are here.</small></a>
+          <p>For the Mac</p>
+          <a href="https://den-frie-vilje.github.io/boomerblaster/">BoomerBlaster<small>A silent disco for the open-plan office</small></a>
+          <a href="https://den-frie-vilje.github.io/docksteady/">docksteady<small>Keeps identical displays where you put them</small></a>
+          <a href="https://den-frie-vilje.github.io/cupertino-files/">cupertino-files<small>Pages, Numbers and Keynote files in TypeScript</small></a>
+        </div>
+      </details>
+      <a class="pill sm" href="#get">Download</a>
+    </div>
+  </div>
+</header>
+
+<div class="buybar" id="buybar">
+  <div><b>Hotfix 0.1.0</b>Free</div>
+  <a class="pill sm" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download</a>
+</div>
+
+<main id="main">
+
+<section class="hero" id="top" aria-labelledby="hero-title" style="padding:0">
+  <div class="stage">
+    <div class="sky" aria-hidden="true"></div>
+    <canvas id="snow" aria-hidden="true"></canvas>
+    <div class="floor" aria-hidden="true"></div>
+    <div class="copy">
+      <p class="eyebrow">Hotfix</p>
+      <h1 id="hero-title">It's warmer on Windows</h1>
+      <p class="lede">Den Frie Vilje's first Windows release turns the processor and graphics time your PC isn't using into heat for the room. The moment you need the power back, it's yours.</p>
+      <div class="cta" id="hero-cta">
+        <a class="pill" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download Hotfix</a>
+        <a class="more" href="#yield">See how it steps aside</a>
+      </div>
+      <p class="fine">Free. For 64-bit Windows 11 and Windows 10.<sup><a href="#fn-1" id="r-1">1</a></sup></p>
+      <div class="fins" aria-hidden="true"><span class="fin"></span><span class="fin"></span><span class="fin"></span><span class="fin"></span></div>
+    </div>
+    <p class="scrollhint" aria-hidden="true">Scroll to warm up</p>
+  </div>
+</section>
+
+<section class="statement" aria-label="Why it works">
+  <div class="wrap">
+    <p>Every watt a PC draws ends up as heat in the room it stands in. Your PC has always been a heater. <span class="warm">Hotfix just gives it something to do.</span></p>
+  </div>
+</section>
+
+<section class="diffsec" aria-labelledby="diff-title">
+  <div class="wrap">
+    <h2 class="h2 rv" id="diff-title">The Hotfix difference</h2>
+    <div class="diff">
+      <div class="list">
+        <details name="diff" data-v="1" open>
+          <summary>Warmth from the PC you already have <span class="chev" aria-hidden="true"></span></summary>
+          <p>No radiator to buy and no socket to find. Hotfix lives by the clock and puts your processor and graphics card to work warming the room: about 250 watts on the PC it was made on.<sup><a href="#fn-2" id="r-2">2</a></sup></p>
+        </details>
+        <details name="diff" data-v="2">
+          <summary>Steps aside while you work <span class="chev" aria-hidden="true"></span></summary>
+          <p>Twice a second, Hotfix checks how busy your other apps keep the PC. Start a build and the heat drops at once. When the build finishes, the warmth climbs back over ten seconds.</p>
+        </details>
+        <details name="diff" data-v="3">
+          <summary>CPU and GPU, each on its own <span class="chev" aria-hidden="true"></span></summary>
+          <p>The processor and the graphics card yield separately, and in proportion. Fill the GPU with a scene and the CPU keeps you warm. Fill half the cores and Hotfix warms with the other half.</p>
+        </details>
+        <details name="diff" data-v="4">
+          <summary>Nothing to sign in to <span class="chev" aria-hidden="true"></span></summary>
+          <p>No account, no cloud, no telemetry. Hotfix makes no network connections at all, which is unusual for something this warm.</p>
+        </details>
+        <details name="diff" data-v="5">
+          <summary>Our first for Windows <span class="chev" aria-hidden="true"></span></summary>
+          <p>Den Frie Vilje has made software for the Mac for years. Hotfix is the first thing we have shipped for Windows, so we started with the part of a PC that Mac people ask about most.</p>
+        </details>
+      </div>
+      <div class="views">
+        <figure class="v" data-v="1" role="img" aria-label="A desktop corner at dusk. Above the clock, the Hotfix menu is open: Warm with CPU and Warm with GPU are ticked, then Start with Windows, About Hotfix 0.1.0 and Exit.">
+          <div class="desk"></div>
+          <ul class="winmenu">
+            <li class="on">Warm with <u>C</u>PU</li>
+            <li class="on hl">Warm with <u>G</u>PU (NVIDIA GeForce RTX 5070 Ti)</li>
+            <li style="padding:0"><hr style="width:100%"></li>
+            <li><u>S</u>tart with Windows</li>
+            <li><u>A</u>bout Hotfix 0.1.0</li>
+            <li style="padding:0"><hr style="width:100%"></li>
+            <li>E<u>x</u>it</li>
+          </ul>
+          <div class="taskbar">
+            <svg class="ti" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="m4 10 4-4 4 4"/></svg>
+            <span class="hot"><svg class="ti"><use href="#fins"/></svg></span>
+            <svg class="ti" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6.5a9 9 0 0 1 12 0M4.2 9a6 6 0 0 1 7.6 0M6.4 11.4a3 3 0 0 1 3.2 0"/><circle cx="8" cy="13.4" r=".6" fill="currentColor"/></svg>
+            <svg class="ti" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2.5 6h2.5l3.5-3v10L5 10H2.5z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.8a6 6 0 0 1 0 8.4"/></svg>
+            <span class="clock">14:32<br>14-10-2026</span>
+          </div>
+        </figure>
+        <figure class="v" data-v="2" role="img" aria-label="A chart over two minutes. Your work rises sharply for a build and falls again. Hotfix's heat drops to nothing the moment the build starts and climbs back over ten seconds after it ends.">
+          <div class="chart">
+            <div class="key"><span style="--k:#4aa3ff">Your work</span><span style="--k:#e8590c">Hotfix</span></div>
+            <svg viewBox="0 0 400 220" preserveAspectRatio="none" aria-hidden="true">
+              <g stroke="#232a3b" stroke-width="1"><path d="M0 20H400M0 75H400M0 130H400M0 185H400"/></g>
+              <path d="M0 200 L120 200 L126 40 L250 46 L256 200 L400 200" fill="rgba(74,163,255,.18)" stroke="#4aa3ff" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M0 30 L122 30 L126 200 L256 200 L318 30 L400 30" fill="none" stroke="#e8590c" stroke-width="3" stroke-linejoin="round"/>
+              <g fill="#8a92a3" font-size="11" font-family="Segoe UI, system-ui, sans-serif"><text x="124" y="216">build starts</text><text x="258" y="216">ends</text><text x="300" y="20">ten seconds later</text></g>
+            </svg>
+          </div>
+        </figure>
+        <figure class="v" data-v="3" role="img" aria-label="Two gauges. CPU: four fins lit, 100 per cent, warming. GPU: no fins lit, 0 per cent, your scene is rendering.">
+          <div class="gauges">
+            <div class="gauge"><svg viewBox="0 0 256 256"><use href="#fins"/></svg><b>100%</b><span>CPU, warming</span></div>
+            <div class="gauge"><svg viewBox="0 0 256 256"><g fill="#3a4152"><rect x="8" y="16" width="48" height="224" rx="24"/><rect x="72" y="16" width="48" height="224" rx="24"/><rect x="136" y="16" width="48" height="224" rx="24"/><rect x="200" y="16" width="48" height="224" rx="24"/></g></svg><b>0%</b><span>GPU, your scene is rendering</span></div>
+          </div>
+        </figure>
+        <figure class="v" data-v="4" role="img" aria-label="A large zero: bytes sent, accounts, cookies.">
+          <div class="zero"><b>0</b><p>bytes sent. Accounts. Cookies.</p></div>
+        </figure>
+        <figure class="v" data-v="5" role="img" aria-label="A window whose three coloured Mac buttons give way to the Windows minimise, maximise and close buttons.">
+          <div class="chrome">
+            <div class="window">
+              <div class="tb">
+                <span class="lights"><i></i><i></i><i></i></span>
+                <span class="caps"><i><svg viewBox="0 0 10 10"><path d="M0 5h10" stroke="currentColor"/></svg></i><i><svg viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="currentColor"/></svg></i><i><svg viewBox="0 0 10 10"><path d="m0 0 10 10M10 0 0 10" stroke="currentColor"/></svg></i></span>
+              </div>
+              <div class="body"><b>Hello, Windows.</b><span>From a studio that has only ever shipped for the Mac.</span></div>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hello" aria-labelledby="hello-title">
+  <div class="wrap">
+    <h2 class="rv" id="hello-title">Say hello to warmth</h2>
+    <div class="tile rv" aria-hidden="true"><svg><use href="#fins"/></svg><span class="ok"><svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2"><path d="m3 7.2 2.6 2.6L11 4.4"/></svg></span></div>
+    <p class="rv">No need to remember your gloves. Sign in with your face, fingerprint or PIN as usual. The keyboard is already warm.<sup><a href="#fn-3" id="r-3">3</a></sup></p>
+    <a class="pill ghost rv" href="#yield">Explore how it steps aside</a>
+  </div>
+</section>
+
+<section class="tmsec center" id="yield" aria-labelledby="tm-title">
+  <div class="wrap">
+    <h2 class="h2 rv" id="tm-title">For once, Very high is a good thing</h2>
+    <p class="sub rv">Task Manager rates Hotfix's power usage Very high. Then you start working, and it isn't. Try it.</p>
+    <div class="tm rv" role="group" aria-label="A Task Manager simulation">
+      <div class="title"><svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="2" fill="#2b88d8"/><path d="M3 10l3-3 2 2 4-4" stroke="#fff" stroke-width="1.4" fill="none"/></svg>Task Manager<div class="search">Type a name, publisher, or PID to search</div><div class="caps2" aria-hidden="true"><i><svg viewBox="0 0 10 10"><path d="M0 5h10" stroke="#fff"/></svg></i><i><svg viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="#fff"/></svg></i><i><svg viewBox="0 0 10 10"><path d="m0 0 10 10M10 0 0 10" stroke="#fff"/></svg></i></div></div>
+      <div class="inner">
+        <div class="rail" aria-hidden="true">
+          <i><svg viewBox="0 0 16 16" stroke="currentColor" fill="none"><path d="M2 4h12M2 8h12M2 12h12"/></svg></i>
+          <i class="on"><svg viewBox="0 0 16 16" stroke="currentColor" fill="none"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg></i>
+          <i><svg viewBox="0 0 16 16" stroke="currentColor" fill="none"><path d="M1 12 5 7l3 3 6-7"/></svg></i>
+          <i><svg viewBox="0 0 16 16" stroke="currentColor" fill="none"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 2"/></svg></i>
+          <i><svg viewBox="0 0 16 16" stroke="currentColor" fill="none"><path d="M3 13c2-6 8-6 10 0M8 3v4"/></svg></i>
+          <i><svg viewBox="0 0 16 16" stroke="currentColor" fill="none"><circle cx="6" cy="6" r="2.5"/><path d="M1.5 13c.8-3 8.2-3 9 0"/></svg></i>
+          <i><svg viewBox="0 0 16 16" stroke="currentColor" fill="none"><path d="M3 3h10M3 6.5h10M3 10h10M3 13.5h6"/></svg></i>
+        </div>
+        <div class="pane">
+          <div class="head"><h3>Processes</h3><div class="tools" aria-hidden="true"><span>Run new task</span><span class="dim">End task</span><span class="dim">Efficiency mode</span></div></div>
+          <table>
+            <thead>
+              <tr><th scope="col">Name</th><th scope="col" class="st">Status</th><th scope="col"><b id="t-cpu">0%</b>CPU</th><th scope="col"><b>41%</b>Memory</th><th scope="col"><b id="t-gpu">0%</b>GPU</th><th scope="col">Power usage</th></tr>
+            </thead>
+            <tbody>
+              <tr class="grp"><td colspan="6">Apps (3)</td></tr>
+              <tr><td><span class="name"><svg id="hf-ico" viewBox="0 0 256 256" aria-hidden="true"></svg>Hotfix</span></td><td class="st" id="hf-st"></td><td id="hf-cpu">0%</td><td>58.2 MB</td><td id="hf-gpu">0%</td><td id="hf-pw">Very low</td></tr>
+              <tr><td><span class="name"><span class="ico" style="background:#68217a" aria-hidden="true">B</span>Your build</span></td><td class="st"></td><td id="b-cpu">0%</td><td id="b-mem">0 MB</td><td>0%</td><td id="b-pw">Very low</td></tr>
+              <tr><td><span class="name"><span class="ico" style="background:#107c10" aria-hidden="true">3D</span>Your scene</span></td><td class="st"></td><td id="s-cpu">0.1%</td><td>1,204 MB</td><td id="s-gpu">0%</td><td id="s-pw">Very low</td></tr>
+              <tr class="grp"><td colspan="6">Background processes (2)</td></tr>
+              <tr><td><span class="name"><span class="ico" style="background:#5c5c5c" aria-hidden="true">W</span>Desktop Window Manager</span></td><td class="st"></td><td id="d-cpu">0.8%</td><td>88.0 MB</td><td id="d-gpu">2.1%</td><td>Very low</td></tr>
+              <tr><td><span class="name"><span class="ico" style="background:#0f6cbd" aria-hidden="true">41</span>Your 41 browser tabs</span></td><td class="st"></td><td id="w-cpu">2.4%</td><td>6,214 MB</td><td>0.9%</td><td>Low</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="demo">
+      <button class="toggle" type="button" id="btn-build" aria-pressed="false">Start a build</button>
+      <button class="toggle" type="button" id="btn-scene" aria-pressed="false">Render a scene</button>
+    </div>
+    <p class="readout" id="readout" aria-live="polite"></p>
+    <p class="tmnote">Simulated in your browser, with the same rules Hotfix follows.<sup><a href="#fn-4" id="r-4">4</a></sup></p>
+  </div>
+</section>
+
+<section class="vs center" id="versus" aria-labelledby="vs-title">
+  <div class="wrap">
+    <h2 class="h2 rv" id="vs-title">Hotfix vs. others</h2>
+    <div class="vsgrid rv" role="table" aria-label="Hotfix compared with other major heating systems">
+      <div role="row" style="display:contents">
+        <span class="spacer" role="columnheader"></span>
+        <span class="colhead" role="columnheader"><svg aria-hidden="true"><use href="#fins"/></svg>Hotfix</span>
+        <span class="colhead dim" role="columnheader">Other major heating systems</span>
+      </div>
+      <div role="row" style="display:contents"><span class="rowhead" role="rowheader"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="2" y="3" width="14" height="10" rx="1.5"/><path d="M6 16h6"/></svg>Flexibility</span><span class="cell us first" role="cell">Uses the PC you already have</span><span class="cell them first" role="cell">Requires a separate appliance</span></div>
+      <div role="row" style="display:contents"><span class="rowhead" role="rowheader"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 9h12M9 3v12"/></svg>Compatibility</span><span class="cell us" role="cell">Works with your apps, and steps aside for them</span><span class="cell them" role="cell">May require a free socket<sup><a href="#fn-5" id="r-5">5</a></sup></span></div>
+      <div role="row" style="display:contents"><span class="rowhead" role="rowheader"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M9 2c3 4-1 5 2 9a3 3 0 1 1-6 0c0-3 3-4 4-9z"/></svg>Local heat</span><span class="cell us" role="cell">Generated on device. No cloud required.</span><span class="cell them" role="cell">Heat varies by radiator</span></div>
+      <div role="row" style="display:contents"><span class="rowhead" role="rowheader"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="2" y="5" width="14" height="8" rx="4"/><path d="M6 8v2M5 9h2M12 9h.01"/></svg>Gaming</span><span class="cell us" role="cell">Steps aside for every PC game</span><span class="cell them" role="cell">Fewer PC titles to choose from</span></div>
+      <div role="row" style="display:contents"><span class="rowhead" role="rowheader"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M9 2 3 4.5v4c0 3.6 2.6 6.4 6 7.5 3.4-1.1 6-3.9 6-7.5v-4z"/></svg>Security</span><span class="cell us last" role="cell">Collects nothing. Connects to nothing.</span><span class="cell them last" role="cell">Varies by landlord</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="plans center light" id="get" aria-labelledby="plans-title">
+  <div class="wrap">
+    <h2 class="h2" id="plans-title">Choose the Hotfix that's right for you</h2>
+    <p class="sub">Save 0% when you pay yearly for Hotfix.</p>
+    <div class="billing" role="radiogroup" aria-label="Billing">
+      <input type="radio" name="billing" id="yearly" checked><label for="yearly">Paid yearly</label>
+      <input type="radio" name="billing" id="monthly"><label for="monthly">Paid monthly</label>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <span class="badge">Save 0 kr. with a yearly plan</span>
+        <h3>Hotfix Personal</h3>
+        <p class="price"><span class="y">0 kr./year</span><span class="m">0 kr./month</span></p>
+        <div class="apps" aria-hidden="true"><span style="background:linear-gradient(135deg,#c42b1c,#e8590c)">CPU</span></div>
+        <p class="incl">Hotfix Personal includes:</p>
+        <ul><li>For 1 person</li><li>Warm with CPU</li><li>Steps aside while you work</li><li>Start with Windows</li></ul>
+        <div class="buy"><a class="pill" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download</a><a class="more" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Portable.zip">Or try free for one winter</a></div>
+      </article>
+      <article class="card">
+        <span class="badge">Save 0 kr. with a yearly plan</span>
+        <h3>Hotfix Family</h3>
+        <p class="price"><span class="y">0 kr./year</span><span class="m">0 kr./month</span></p>
+        <div class="apps" aria-hidden="true"><span style="background:linear-gradient(135deg,#c42b1c,#e8590c)">CPU</span><span style="background:linear-gradient(135deg,#e8590c,#f59f00)">GPU</span></div>
+        <p class="incl">Everything in Hotfix Personal, plus:</p>
+        <ul><li>Warm with GPU</li><li>For 1 to 6 people, if they sit close<sup><a href="#fn-6" id="r-6">6</a></sup></li><li>CPU and GPU, each on its own</li></ul>
+        <div class="buy"><a class="pill" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download</a><a class="more" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Portable.zip">Or try free for one winter</a></div>
+      </article>
+      <article class="card">
+        <span class="badge">Save 0 kr. with a yearly plan</span>
+        <h3>Hotfix Premium</h3>
+        <p class="price"><span class="y">0 kr./year</span><span class="m">0 kr./month</span></p>
+        <div class="apps" aria-hidden="true"><span style="background:linear-gradient(135deg,#c42b1c,#e8590c)">CPU</span><span style="background:linear-gradient(135deg,#e8590c,#f59f00)">GPU</span><span style="background:linear-gradient(135deg,#f59f00,#fcc419);color:#000">1st</span></div>
+        <p class="incl">Everything in Hotfix Family, plus:</p>
+        <ul><li>Den Frie Vilje's first Windows release, at no extra cost</li><li>The same file as the other two<sup><a href="#fn-7" id="r-7">7</a></sup></li></ul>
+        <div class="buy"><a class="pill" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download</a><a class="more" href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Portable.zip">Or try free for one winter</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="paper" id="specs" aria-labelledby="specs-title">
+  <div class="wrap">
+    <h2 class="h2" id="specs-title">Will Hotfix run on my PC?</h2>
+    <dl class="specs">
+      <div class="spec"><dt>Operating system</dt><dd>64-bit Windows 11, or Windows 10 version 1903 or later<small>Tested on Windows 11 version 25H2</small></dd></div>
+      <div class="spec"><dt>Processor</dt><dd>Any x64 processor<small>AVX2 and FMA make it warmer: Intel since 2013, AMD since 2015</small></dd></div>
+      <div class="spec"><dt>Graphics</dt><dd>A DirectX 12 graphics card, for Warm with GPU<small>Without one, Hotfix warms with the CPU alone</small></dd></div>
+      <div class="spec"><dt>Heat</dt><dd>About 250 W on the PC it was made on<small>About 140 W from an Intel Core Ultra 7 265K and 110 W from an NVIDIA GeForce RTX 5070 Ti, above idle<sup><a href="#fn-2">2</a></sup></small></dd></div>
+      <div class="spec"><dt>Storage</dt><dd>About 120 MB<small>Hotfix brings its own copy of .NET, so there is nothing else to install</small></dd></div>
+      <div class="spec"><dt>Administrator rights</dt><dd>Not required<small>Hotfix installs for you only</small></dd></div>
+      <div class="spec"><dt>TPM 2.0</dt><dd>Not required<small>We checked twice</small></dd></div>
+      <div class="spec"><dt>Microsoft account</dt><dd>Not required<small>Or any other account</small></dd></div>
+      <div class="spec"><dt>Internet connection</dt><dd>Not required<small>Not used, either</small></dd></div>
+      <div class="spec"><dt>In the box</dt><dd>Hotfix, an icon by the clock and a menu with five items<small>Not in the box: a radiator, Copilot</small></dd></div>
+      <div class="spec"><dt>Licence</dt><dd>MIT<small><a class="more" href="https://github.com/den-frie-vilje/hotfix">Source code on GitHub</a></small></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="kb" id="kb" aria-labelledby="kb-title">
+  <div class="wrap">
+    <article class="article">
+      <p class="crumbs"><a href="#top">Hotfix</a> › Troubleshooting</p>
+      <h2 id="kb-title">The office is cold</h2>
+      <p class="applies">Applies to <span>Open-plan offices</span><span>Windows 11</span><span>Windows 10</span><span>Your fingers</span></p>
+      <h3>Symptoms</h3>
+      <p>You are wearing a jumper indoors. Your typing has slowed. A colleague has mentioned the thermostat twice since lunch.</p>
+      <h3>Cause</h3>
+      <p>This problem occurs because someone else controls the heating, while your PC's processor and graphics card spend most of the day idle.</p>
+      <h3>Resolution</h3>
+      <p>To resolve this problem, install Hotfix:</p>
+      <ol>
+        <li>Download <a href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe"><code>Hotfix-win-Setup.exe</code></a>.</li>
+        <li>Open it. If Windows shows <b>Windows protected your PC</b>, select <b>More info</b>, then <b>Run anyway</b>.<sup><a href="#fn-8" id="r-8">8</a></sup></li>
+        <li>Wait. Hotfix starts warming at once, and turns itself down whenever you work.</li>
+      </ol>
+      <h3>Status</h3>
+      <p>Den Frie Vilje has confirmed that this is a problem in the offices listed in the Applies to section.</p>
+      <h3>More information</h3>
+      <p>To change what Hotfix warms with, select its icon in the notification area. To uninstall it, go to <b>Settings</b> › <b>Apps</b> › <b>Installed apps</b>.</p>
+      <div class="helpful">Was this information helpful? <button type="button" data-helpful>Yes</button><button type="button" data-helpful>No</button><output id="helpful-out" aria-live="polite"></output></div>
+    </article>
+  </div>
+</section>
+
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <div class="wrap center">
+    <h2 class="h2" id="faq-title">Questions about Hotfix?<br>Start here.</h2>
+    <div class="faqtools"><button type="button" id="expand">Expand all</button><button type="button" id="collapse">Collapse all</button></div>
+    <div class="qs" style="text-align:left">
+      <details><summary>What is Hotfix? <span class="chev" aria-hidden="true"></span></summary><div><p>A small Windows app that keeps your processor and graphics card busy with arithmetic, so that the electricity they draw warms the room you are sitting in. It lives in the notification area and has a menu with five items.</p></div></details>
+      <details id="faq-slow"><summary>Will Hotfix slow down my work? <span class="chev" aria-hidden="true"></span></summary><div><p>Hardly. Hotfix runs at the lowest priority Windows has, on the processor and on the graphics card, so your work always goes first. That alone is not enough, because a chip that is kept hot clocks lower, so Hotfix also turns itself down while your apps are busy and back up when they are quiet.</p><p>On the PC it was made on, single-thread work ran no slower with Hotfix warming than without it. Work that fills your processor or your graphics card makes that half of Hotfix stand down altogether, and the other half carries on.<sup><a href="#fn-9" id="r-9">9</a></sup></p></div></details>
+      <details><summary>How much heat does it make? <span class="chev" aria-hidden="true"></span></summary><div><p>Whatever your PC can draw. On the PC Hotfix was made on, it adds about 140 W from the processor and 110 W from the graphics card: 250 W, a quarter of a small fan heater. A laptop makes much less.</p></div></details>
+      <details id="faq-eff"><summary>Is it efficient? <span class="chev" aria-hidden="true"></span></summary><div><p>Exactly as efficient as any electric heater: every watt becomes heat. A heat pump does three to four times better, if you have one and are allowed to touch it.</p><p>At 250 W for an eight-hour day, Hotfix uses 2 kWh. At 2.50 kr. a kWh, that is 5 kr. a day.</p></div></details>
+      <details id="faq-safe"><summary>Is it safe for my PC? <span class="chev" aria-hidden="true"></span></summary><div><p>Hotfix asks no more of your PC than a long render or a game does, and it never changes a clock, a voltage or a power limit. Processors and graphics cards protect themselves from heat by slowing down. Your fans will be audible.</p></div></details>
+      <details><summary>Does Hotfix work with Copilot? <span class="chev" aria-hidden="true"></span></summary><div><p>No.</p></div></details>
+      <details><summary>Can I use it at work? <span class="chev" aria-hidden="true"></span></summary><div><p>Ask whoever pays for the electricity. Hotfix installs without administrator rights, which is not the same thing as permission.</p></div></details>
+      <details><summary>How do I uninstall Hotfix? <span class="chev" aria-hidden="true"></span></summary><div><p>Go to <b>Settings</b> › <b>Apps</b> › <b>Installed apps</b>, select <b>…</b> next to Hotfix, then <b>Uninstall</b>. Its Start with Windows entry and its settings go with it.</p></div></details>
+      <details><summary>Why is Hotfix Den Frie Vilje's first Windows release? <span class="chev" aria-hidden="true"></span></summary><div><p>Someone in the office was cold, and the PC under their desk had a graphics card in it.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<aside class="notes" aria-label="Footnotes">
+  <div class="wrap">
+    <div class="box">
+      <ol>
+        <li id="fn-1">Tested on Windows 11 version 25H2. Windows 10 version 1903 or later should work; nobody has tried it there yet. <a href="#r-1" aria-label="Back to reference 1">↩</a></li>
+        <li id="fn-2">Measured on a Dell Pro Max Tower T2 with an Intel Core Ultra 7 265K and an NVIDIA GeForce RTX 5070 Ti, after a minute of warming, as package and board power above idle. Your PC will differ. <a href="#r-2" aria-label="Back to reference 2">↩</a></li>
+        <li id="fn-3">Hotfix does not warm the keyboard directly. Keyboards near the exhaust may vary. <a href="#r-3" aria-label="Back to reference 3">↩</a></li>
+        <li id="fn-4">The simulation runs Hotfix's rules on made-up numbers: heat follows the room your other apps leave on each part, drops at once and climbs back over ten seconds. It does not warm your PC. Much. <a href="#r-4" aria-label="Back to reference 4">↩</a></li>
+        <li id="fn-5">And an extension lead, and somebody to trip over it. <a href="#r-5" aria-label="Back to reference 5">↩</a></li>
+        <li id="fn-6">The heat is shared by everyone in the room. Sitting closer is not a feature. It is physics. <a href="#r-6" aria-label="Back to reference 6">↩</a></li>
+        <li id="fn-7">All three plans are the same download. Which one you have chosen is between you and your conscience. <a href="#r-7" aria-label="Back to reference 7">↩</a></li>
+        <li id="fn-8">The installer is not code-signed yet, so Microsoft Defender SmartScreen has not met it. It is built from the public source by GitHub Actions. <a href="#r-8" aria-label="Back to reference 8">↩</a></li>
+        <li id="fn-9">Measured with the <a href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/YieldCheck/Program.cs">yield check</a> in the repository, which you can run on your own PC to see what Hotfix costs there. <a href="#r-9" aria-label="Back to reference 9">↩</a></li>
+      </ol>
+      <p id="legal">This page parodies a register, not a company. Hotfix is not affiliated with, endorsed by or patched by Microsoft. Windows, Task Manager, Microsoft Defender SmartScreen, Copilot, Surface, Microsoft 365 and DirectX are trademarks of the Microsoft group of companies, NVIDIA GeForce of NVIDIA Corporation, Intel Core of Intel Corporation, and Mac of Apple Inc. There are no ads on this page, and no cookies.</p>
+    </div>
+  </div>
+</aside>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div><h4>What's new</h4><ul><li><a href="https://github.com/den-frie-vilje/hotfix/releases">Hotfix 0.1.0</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/releases">Release notes</a></li><li><a href="#top">Our first Windows release</a></li></ul></div>
+      <div><h4>Hotfix Store</h4><ul><li><a href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Download Hotfix</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Portable.zip">Portable download</a></li><li><a href="#get">Plans and pricing</a></li></ul></div>
+      <div><h4>Education</h4><ul><li><a href="#yield">How Hotfix steps aside</a></li><li><a href="#kb">The office is cold</a></li><li><a href="https://en.wikipedia.org/wiki/First_law_of_thermodynamics">Thermodynamics</a></li></ul></div>
+      <div><h4>Business</h4><ul><li><a href="https://denfrievilje.dk">Den Frie Vilje ApS</a></li><li><a href="#get">Hotfix for Business</a></li><li><a href="#faq">Can I use it at work?</a></li></ul></div>
+      <div><h4>Developer &amp; IT</h4><ul><li><a href="https://github.com/den-frie-vilje/hotfix">Source code</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/blob/main/tests/YieldCheck/Program.cs">The yield check</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/blob/main/RELEASING.md">Releasing</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="https://denfrievilje.dk">About Den Frie Vilje</a></li><li><a href="https://github.com/den-frie-vilje">Our other software</a></li><li><a href="https://github.com/den-frie-vilje/hotfix/issues">Contact us</a></li></ul></div>
+    </div>
+    <div class="legal">
+      <span class="lang"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2 11 0 13M8 1.5c-2 2-2 11 0 13"/></svg>English (Denmark)</span>
+      <a class="choices" href="#legal"><svg viewBox="0 0 30 14" aria-hidden="true"><rect x=".5" y=".5" width="29" height="13" rx="6.5" fill="#fff" stroke="#0067b8"/><path d="M15 .5h8a6.5 6.5 0 0 1 0 13h-8z" fill="#0067b8"/><path d="m7 4.5 3 3 3-3" stroke="#0067b8" fill="none" transform="rotate(0)"/><path d="m19 4.5 4 4m0-4-4 4" stroke="#fff"/></svg>Your Privacy Choices</a>
+      <a href="#faq-safe">Consumer Health Privacy</a>
+      <a href="#top">Sitemap</a>
+      <a href="https://github.com/den-frie-vilje/hotfix/issues">Contact Den Frie Vilje</a>
+      <a href="https://github.com/den-frie-vilje/hotfix#privacy-statement">Privacy</a>
+      <a href="https://github.com/den-frie-vilje/hotfix/blob/main/LICENSE">Terms of use</a>
+      <a href="#legal">Trademarks</a>
+      <a href="#faq-eff">Safety &amp; eco</a>
+      <a href="#legal">About our ads</a>
+      <span>© Den Frie Vilje 2026</span>
+    </div>
+  </div>
+</footer>
+
+<button class="chatbtn" type="button" popovertarget="chat"><span class="av"><svg aria-hidden="true"><use href="#fins"/></svg></span><span>Cold?<small>Let's chat</small></span></button>
+<div class="chat" id="chat" popover role="dialog" aria-labelledby="chat-title">
+  <header><span id="chat-title">Hotfix assistant</span><button type="button" popovertarget="chat" popovertargetaction="hide" aria-label="Close"><svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="m0 0 10 10M10 0 0 10" stroke="#fff"/></svg></button></header>
+  <p class="msg">It looks like you're cold. Would you like help with that?</p>
+  <div class="acts">
+    <a href="https://github.com/den-frie-vilje/hotfix/releases/latest/download/Hotfix-win-Setup.exe">Yes, download Hotfix</a>
+    <button type="button" popovertarget="chat" popovertargetaction="hide">No, I'll put a jumper on</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const root = document.documentElement;
+  const hero = document.querySelector(".hero");
+
+  // Heat for browsers without scroll-driven animations; the CSS does it where they exist.
+  if (!reduce && !CSS.supports("animation-timeline: scroll()")) {
+    let queued = false;
+    const warm = () => { queued = false; root.style.setProperty("--heat", Math.min(1, scrollY / (innerHeight * .85)).toFixed(3)); };
+    addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(warm); } }, { passive: true });
+    warm();
+  }
+
+  // Snow in the hero, only while it is on screen, and none for people who asked for less motion.
+  const canvas = document.getElementById("snow");
+  if (canvas && !reduce) {
+    const ctx = canvas.getContext("2d");
+    let flakes = [], w = 0, h = 0, running = false;
+    const size = () => {
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      flakes = Array.from({ length: Math.round(w * h / 9000) }, () => ({ x: Math.random() * w, y: Math.random() * h, r: .6 + Math.random() * 1.8, s: .25 + Math.random() * .7, d: Math.random() * 6 }));
+    };
+    const frame = (t) => {
+      if (!running) return;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "rgba(255,255,255,.75)";
+      for (const f of flakes) {
+        f.y += f.s; f.x += Math.sin(t / 1600 + f.d) * .25;
+        if (f.y > h + 4) { f.y = -4; f.x = Math.random() * w; }
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.283); ctx.fill();
+      }
+      requestAnimationFrame(frame);
+    };
+    size(); addEventListener("resize", size);
+    new IntersectionObserver(([e]) => { running = e.isIntersecting; if (running) requestAnimationFrame(frame); }).observe(canvas);
+  }
+
+  // The purchase pill rides along once the hero's own button has gone.
+  const bar = document.getElementById("buybar"), cta = document.getElementById("hero-cta");
+  new IntersectionObserver(([e]) => bar.classList.toggle("show", !e.isIntersecting && e.boundingClientRect.top < 0)).observe(cta);
+
+  // Task Manager: the same rules as Hotfix's Heater.cs, on made-up load.
+  const $ = (id) => document.getElementById(id);
+  const Quiet = { cpu: .10, gpu: 5 }, Busy = { cpu: .35, gpu: 40 }, Climb = .05;
+  const room = (others, k) => Math.max(0, Math.min(1, (Busy[k] - others) / (Busy[k] - Quiet[k])));
+  const follow = (heat, target) => target < heat ? target : Math.min(target, heat + Climb);
+  const state = { build: false, scene: false, cpu: 1, gpu: 1, buildMem: 0 };
+  const jitter = (v, a) => Math.max(0, v + (Math.random() - .5) * a);
+  const pct = (v) => (v < .05 ? "0" : v < 10 ? v.toFixed(1) : Math.round(v)) + "%";
+  const power = (w) => w > 150 ? "Very high" : w > 90 ? "High" : w > 40 ? "Moderate" : w > 5 ? "Low" : "Very low";
+  const shade = (el, u) => el.style.setProperty("--u", Math.min(1, u).toFixed(2));
+  const icon = $("hf-ico"), colours = ["#C42B1C", "#E8590C", "#F59F00", "#FCC419"];
+  const drawIcon = (lit) => { icon.innerHTML = colours.map((c, i) => `<rect x="${8 + i * 64}" y="16" width="48" height="224" rx="24" fill="${i < lit ? c : "#6b6b6b"}"/>`).join(""); };
+  let lastSaid = "";
+  const tick = () => {
+    const buildCpu = state.build ? jitter(86, 8) : 0;
+    const sceneGpu = state.scene ? jitter(91, 5) : 0;
+    const othersCpu = .045 + buildCpu / 100 + (state.scene ? .02 : 0);
+    const othersGpu = 3 + sceneGpu;
+    state.cpu = follow(state.cpu, room(othersCpu, "cpu"));
+    state.gpu = follow(state.gpu, room(othersGpu, "gpu"));
+    const hfCpu = state.cpu * (100 - othersCpu * 100) * .97, hfGpu = state.gpu * (100 - othersGpu) * .96;
+    state.buildMem = state.build ? Math.min(2400, state.buildMem + 380) : Math.max(0, state.buildMem - 600);
+    $("hf-cpu").textContent = pct(hfCpu); shade($("hf-cpu"), hfCpu / 100);
+    $("hf-gpu").textContent = pct(hfGpu); shade($("hf-gpu"), hfGpu / 100);
+    const watts = 140 * state.cpu + 110 * state.gpu;
+    $("hf-pw").textContent = power(watts); shade($("hf-pw"), watts / 250);
+    $("hf-st").textContent = state.cpu < 1 || state.gpu < 1 ? "Stepping aside" : "";
+    $("b-cpu").textContent = pct(buildCpu); shade($("b-cpu"), buildCpu / 100);
+    $("b-mem").textContent = Math.round(state.buildMem).toLocaleString("en") + " MB";
+    $("b-pw").textContent = state.build ? "High" : "Very low"; shade($("b-pw"), state.build ? .6 : 0);
+    $("s-gpu").textContent = pct(sceneGpu); shade($("s-gpu"), sceneGpu / 100);
+    $("s-cpu").textContent = pct(state.scene ? jitter(4, 2) : .1);
+    $("s-pw").textContent = state.scene ? "High" : "Very low"; shade($("s-pw"), state.scene ? .6 : 0);
+    $("d-cpu").textContent = pct(jitter(.8, .4)); $("d-gpu").textContent = pct(jitter(2.1, .8));
+    $("w-cpu").textContent = pct(jitter(2.4, 1.2));
+    const totalCpu = Math.min(100, hfCpu + othersCpu * 100), totalGpu = Math.min(100, hfGpu + othersGpu);
+    $("t-cpu").textContent = Math.round(totalCpu) + "%"; $("t-gpu").textContent = Math.round(totalGpu) + "%";
+    const mean = (state.cpu + state.gpu) / 2;
+    drawIcon(mean > 0 ? Math.max(1, Math.round(mean * 4)) : 0);
+    const said = `Hotfix: CPU ${Math.round(state.cpu * 100)}%, GPU ${Math.round(state.gpu * 100)}%` + (state.cpu < 1 || state.gpu < 1 ? "; turned down while you work" : "");
+    $("readout").textContent = said;
+    // Announce changes of state only, so a screen reader is not read a number twice a second.
+    const coarse = said.replace(/\d+%/g, (m) => (parseInt(m) === 0 ? "0%" : parseInt(m) === 100 ? "100%" : "part"));
+    $("readout").setAttribute("aria-live", coarse === lastSaid ? "off" : "polite"); lastSaid = coarse;
+  };
+  let timer = null;
+  new IntersectionObserver(([e]) => { clearInterval(timer); timer = e.isIntersecting ? setInterval(tick, 500) : null; }).observe(document.querySelector(".tm"));
+  tick();
+  for (const [id, key, on, off] of [["btn-build", "build", "Stop the build", "Start a build"], ["btn-scene", "scene", "Stop rendering", "Render a scene"]]) {
+    const b = $(id);
+    b.addEventListener("click", () => { state[key] = !state[key]; b.setAttribute("aria-pressed", state[key]); b.textContent = state[key] ? on : off; tick(); });
+  }
+
+  // FAQ: expand and collapse all.
+  const qs = [...document.querySelectorAll(".qs details")];
+  $("expand").addEventListener("click", () => qs.forEach((d) => d.open = true));
+  $("collapse").addEventListener("click", () => qs.forEach((d) => d.open = false));
+
+  // Was this helpful?
+  document.querySelectorAll("[data-helpful]").forEach((b) => b.addEventListener("click", () => {
+    $("helpful-out").textContent = "Thank you. Your answer went nowhere: this page collects nothing.";
+  }));
+})();
+</script>
+</body>
+</html>

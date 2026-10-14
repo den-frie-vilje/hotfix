@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Hotfix/Hotfix.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/YieldCheck/YieldCheck.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,24 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build the app and the yield check, warnings as errors
+        run: dotnet build Hotfix.slnx -c Release -warnaserror
+      - name: Publish the app as the release does
+        run: dotnet publish src/Hotfix -c Release -r win-x64 --self-contained -o publish
+      - name: Landing page is well formed
+        shell: python
+        run: |
+          import html.parser
+          html.parser.HTMLParser().feed(open("docs/index.html", encoding="utf-8").read())
+          print("ok")
