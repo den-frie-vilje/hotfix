@@ -1,6 +1,6 @@
 // Measures what Hotfix costs the work you care about. Runs a single-thread job, an all-core job and a GPU job
 // at normal priority, first with Hotfix off and then with it running, and prints the slowdown and the power.
-// Exits 1 if any job slows by more than the limit. Hotfix warms for a minute first: a chip that has been hot
+// Exits 1 if any job slows by more than the limit, and 3 without a verdict if other apps were busy. Hotfix warms for a minute first: a chip that has been hot
 // for a while has spent its turbo budget and clocks lower, so a short warm-up would flatter it. Usage:
 //   dotnet run --project tests/YieldCheck -c Release -- path\to\Hotfix.exe [limit-percent] [warm-up-seconds]
 using System.Diagnostics;
@@ -27,6 +27,7 @@ var device = GraphicsDevice.GetDefault();
 using var buffer = device.AllocateReadWriteBuffer<float>(1 << 21);
 Console.WriteLine($"{Environment.ProcessorCount} logical processors; GPU {device.Name}");
 Measure(); // warm up the JIT, the thread pool and the shader
+if (!Quiet("before")) return 3;
 
 var (idleCpuW, idleGpuW) = (CpuWatts(), GpuWatts());
 var off = Measure();
@@ -38,6 +39,7 @@ using (var hotfix = Process.Start(args[0])!)
     var on = Measure();
     hotfix.Kill();
     hotfix.WaitForExit();
+    bool quietAfter = Quiet("after");
 
     Console.WriteLine();
     Console.WriteLine($"{"",-22}{"Hotfix off",12}{"Hotfix on",12}{"Change",10}");
@@ -51,8 +53,20 @@ using (var hotfix = Process.Start(args[0])!)
         Console.WriteLine($"{name,-22}{a,10:F0}ms{b,10:F0}ms{change,9:+0.0;-0.0}%");
     }
     Console.WriteLine();
+    if (!quietAfter) return 3;
     Console.WriteLine(pass ? $"PASS: no job slowed by more than {limit}%." : $"FAIL: a job slowed by more than {limit}%.");
     return pass ? 0 : 1;
+}
+
+// Other apps' load swings from phase to phase and turns the comparison into noise, so the check only gives a verdict
+// when the PC is quiet before and after it. Hotfix isn't running at either point, so the load is everyone else's.
+static bool Quiet(string when)
+{
+    double cpu = Counter(@"\Processor(_Total)\% Processor Time") ?? 0;
+    double gpu = Counter(@"\GPU Engine(*engtype_3D)\Utilization Percentage") ?? 0;
+    if (cpu <= 20 && gpu <= 15) return true;
+    Console.Error.WriteLine($"Other apps were busy {when} the check ({cpu:F0}% CPU, {gpu:F0}% GPU 3D), so its numbers would be noise. Close them and run it again.");
+    return false;
 }
 
 (double Single, double Multi, double Gpu) Measure()
@@ -90,21 +104,24 @@ static string Setting(RegistryKey? key, string name) => key?.GetValue(name) is i
 
 static string W(double? watts) => watts is { } w ? $"{w:F0} W" : "n/a";
 
-// RAPL package power through Windows' Energy Meter counter, in milliwatts; three one-second samples.
-static double? CpuWatts() => Average(Run("typeperf", @"""\Energy Meter(RAPL_Package0_PKG)\Power"" -sc 3")
-    .Where(l => l.StartsWith("\"") && !l.StartsWith("\"(PDH"))
-    .Select(l => l.Split(',')[1].Trim('"')), 1000);
+// RAPL package power through Windows' Energy Meter counter, which counts in milliwatts.
+static double? CpuWatts() => Counter(@"\Energy Meter(RAPL_Package0_PKG)\Power") / 1000;
 
-// NVIDIA only; other GPUs report n/a.
-static double? GpuWatts() => Average(Enumerable.Range(0, 3)
-    .SelectMany(_ => { Thread.Sleep(1000); return Run("nvidia-smi", "--query-gpu=power.draw --format=csv,noheader,nounits").Take(1); }), 1);
-
-static double? Average(IEnumerable<string> values, double divisor)
+// NVIDIA only; other GPUs report n/a. Three one-second samples, averaged.
+static double? GpuWatts() => Mean(Enumerable.Range(0, 3).Select(_ =>
 {
-    var parsed = values.Select(v => double.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : double.NaN)
-        .Where(d => !double.IsNaN(d)).ToList();
-    return parsed.Count > 0 ? parsed.Average() / divisor : null;
-}
+    Thread.Sleep(1000);
+    return Parse(Run("nvidia-smi", "--query-gpu=power.draw --format=csv,noheader,nounits").FirstOrDefault() ?? "");
+}).OfType<double>());
+
+// A performance counter through typeperf: three one-second samples, each summed across instances, averaged.
+static double? Counter(string path) => Mean(Run("typeperf", $"\"{path}\" -sc 3")
+    .Where(l => l.StartsWith('"') && !l.StartsWith("\"(PDH"))
+    .Select(l => l.Split(',').Skip(1).Sum(v => Parse(v.Trim('"')) ?? 0)));
+
+static double? Mean(IEnumerable<double> values) => values.Any() ? values.Average() : null;
+
+static double? Parse(string v) => double.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : null;
 
 static string[] Run(string exe, string arguments)
 {
