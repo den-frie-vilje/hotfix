@@ -11,14 +11,15 @@ namespace Hotfix;
 /// <item>By priority, at once: the CPU threads run at idle priority and the process asks the WDDM scheduler for
 /// idle priority on the GPU, so your work always goes first.</item>
 /// <item>By turning down: a chip kept hot while you work clocks lower and spends its turbo budget, so priority
-/// alone still costs you speed. Each half's heat follows the headroom other apps leave on that part: full while
-/// they are quiet, none while they are busy, in proportion between. It drops at once when your work picks up
-/// and climbs back over ten seconds when it eases.</item>
+/// alone still costs you speed. Each half's heat follows the headroom other apps leave on that part. The CPU half
+/// fills the processor time they leave free, less a reserve for their bursts; the GPU half warms fully while the
+/// graphics card is quiet and not at all while it is busy, in proportion between. Heat drops at once when your work
+/// picks up and climbs back over ten seconds when it eases.</item>
 /// </list>
 /// </summary>
 static class Heater
 {
-    static readonly (double Quiet, double Busy) CpuLoad = (0.10, 0.35); // other apps' share of all logical processors
+    static readonly double CpuReserve = Math.Min(0.5, 2.0 / Environment.ProcessorCount); // two logical processors
     static readonly (double Quiet, double Busy) GpuLoad = (5, 40); // other apps' use of the busiest GPU engine, per cent
     const double Climb = 0.05; // per half-second tick, so ten seconds from nothing to full
     const int GpuWindowMs = 100; // the GPU burns for its share of each window and rests for the rest
@@ -83,6 +84,10 @@ static class Heater
     static double Room(double others, (double Quiet, double Busy) load) =>
         Math.Clamp((load.Busy - others) / (load.Busy - load.Quiet), 0, 1);
 
+    // All of it while other apps are idle, the share they leave free less the reserve while they work, none from
+    // the point where only the reserve is left.
+    static double CpuRoom(double others) => Math.Clamp((1 - others - CpuReserve) / (1 - CpuReserve), 0, 1);
+
     static double Follow(double heat, double target) => target < heat ? target : Math.Min(target, heat + Climb);
 
     static void Watch()
@@ -104,7 +109,7 @@ static class Heater
 
             lock (sync)
             {
-                cpuRoom = Room(cpuOthers, CpuLoad);
+                cpuRoom = CpuRoom(cpuOthers);
                 gpuRoom = Room(gpuOthers, GpuLoad);
                 cpuHeat = Follow(cpuHeat, cpuWanted ? cpuRoom : 0);
                 gpuHeat = Follow(gpuHeat, gpuWanted ? gpuRoom : 0);
@@ -116,6 +121,10 @@ static class Heater
     static void BurnCpu(ManualResetEventSlim gate)
     {
         SetThreadPriority(GetCurrentThread(), IdleThreadPriority);
+        // Windows gives idle-priority threads EcoQoS, which on a hybrid Intel chip kept them to about half the logical
+        // processors at low clocks. Opting out (ThreadPowerThrottling: version 1, execution speed, not throttled)
+        // keeps the idle priority but lets them run on any core at full speed.
+        SetThreadInformation(GetCurrentThread(), 3, [1, 1, 0], 12);
         // Eight independent AVX FMA chains keep both FMA ports busy, all in registers, so caches stay yours. Each
         // starts on the answer, so every multiply-add returns exactly the number it was given (see Burn).
         var m = Vector256.Create(Burn.Half);
@@ -209,6 +218,7 @@ static class Heater
 
     [DllImport("gdi32.dll")] static extern int D3DKMTSetProcessSchedulingPriorityClass(IntPtr process, int priority);
     [DllImport("kernel32.dll")] static extern bool SetThreadPriority(IntPtr thread, int priority);
+    [DllImport("kernel32.dll")] static extern bool SetThreadInformation(IntPtr thread, int infoClass, int[] info, int size);
     [DllImport("kernel32.dll")] static extern IntPtr GetCurrentThread();
     [DllImport("kernel32.dll")] static extern bool GetSystemTimes(out long idle, out long kernel, out long user);
     [DllImport("pdh.dll", CharSet = CharSet.Unicode)] static extern int PdhOpenQuery(string? source, IntPtr user, out IntPtr query);

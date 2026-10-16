@@ -29,7 +29,7 @@ Hotfix is Den Frie Vilje's first Windows release.
 |---|---|
 | **Warm with CPU** | Keeps your processor busy with arithmetic that never touches memory, so your caches stay yours. |
 | **Warm with GPU** | Runs a compute shader on your DirectX 12 graphics card, at the GPU scheduler's idle priority. |
-| **Turns down while you work** | Each half's heat follows the room your other apps leave on that part: full while they're quiet, none while they're busy, in proportion in between. |
+| **Turns down while you work** | The CPU half fills the processor time your other apps leave free, keeping two logical processors in reserve for them. The GPU half warms fully while the graphics card is quiet, and not at all while it's busy. |
 | **CPU and GPU, each on its own** | Fill the graphics card and the processor keeps you warm. Start a build and the graphics card carries on. |
 | **Start with Windows** | One tick in the menu. Off until you choose it. |
 
@@ -97,9 +97,9 @@ To uninstall Hotfix, go to `Settings` > `Apps` > `Installed apps`, select **…*
 Hotfix gets out of your way twice over, separately for the processor and the graphics card.
 
 - **By priority, at once.** Its CPU threads run at idle priority, below everything else on your PC, and it asks the Windows GPU scheduler for the idle priority class. When your work wants a core or the graphics card, it gets it.
-- **By turning down, within half a second.** Priority alone isn't enough, because a chip that is kept hot clocks lower and spends its turbo budget, so your build would still run slower. Twice a second Hotfix reads how busy your other apps keep the processor and the graphics card, from the same counters Task Manager shows. Each half then warms in proportion to the room that's left: fully while other apps use less than 10 per cent of the processor or 5 per cent of the graphics card, not at all above 35 and 40 per cent. The heat drops at once when your work picks up, and climbs back over ten seconds when it eases.
+- **By turning down, within half a second.** Priority alone isn't enough, because a chip that is kept hot clocks lower and spends its turbo budget, so your build would still run slower. Twice a second Hotfix reads how busy your other apps keep the processor and the graphics card, from the same counters Task Manager shows. Each half then warms with the room that's left. The CPU half fills the processor time your apps leave free, keeping two logical processors' worth in reserve for their bursts: if your build uses half the cores, Hotfix warms with most of the other half. The GPU half warms fully while other apps use less than 5 per cent of the graphics card, and not at all above 40 per cent. The heat drops at once when your work picks up, and climbs back over ten seconds when it eases.
 
-The CPU half runs eight chains of AVX fused multiply-adds on each processor thread it uses. They keep the floating-point units busy without touching memory. The GPU half runs a compute shader that does the same on every core of the graphics card, in slices of a few milliseconds.
+The CPU half runs eight chains of AVX fused multiply-adds on each processor thread it uses. They keep the floating-point units busy without touching memory. The threads opt out of Windows' EcoQoS power throttling, which would otherwise keep idle-priority work on the efficiency cores at low clocks. The GPU half runs a compute shader that does the same on every core of the graphics card, in slices of a few milliseconds.
 
 Both compute x × ½ + 2⁻¹²⁶, which settles on 2⁻¹²⁵ and stays there, so every multiply-add returns exactly the number it was given. That is as close to nothing as a calculation of its kind can settle while every value stays a normal float, and smaller, subnormal numbers would slow the chips down and make less heat. Den Frie Vilje Research [explains how it was found](https://den-frie-vilje.github.io/hotfix/#research), in a blog post and a [technical report](https://den-frie-vilje.github.io/hotfix/paper/DFV-TR-2026-01.pdf) (PDF), and [the answer check](tests/AnswerCheck/Program.cs) holds the shipped code to it:
 

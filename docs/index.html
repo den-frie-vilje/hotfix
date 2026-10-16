@@ -97,7 +97,7 @@
   .buybar { position: fixed; top: 66px; right: 24px; z-index: 40; display: flex; align-items: center; gap: 14px; padding: 6px 6px 6px 18px; border-radius: 999px; background: rgba(30, 30, 34, .72); -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%); box-shadow: 0 8px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.1); font-size: 13px; line-height: 1.2; transform: translateY(-14px); opacity: 0; pointer-events: none; transition: opacity .25s var(--ease), transform .25s var(--ease); }
   .buybar b { font-weight: 600; display: block; }
   .buybar.show { opacity: 1; transform: none; pointer-events: auto; }
-  @media (max-width: 700px) { .buybar { display: none; } }
+  @media (max-width: 1299px) { .buybar { display: none; } }
 
   /* hero: pinned for a while, the fins heat with the scroll */
   .hero { height: 190vh; position: relative; background: var(--night); }
@@ -456,6 +456,53 @@
   .bib summary { cursor: pointer; color: var(--blue-store); width: max-content; }
   .bib pre { margin-top: 10px; padding: 14px 16px; background: #f5f5f5; border-radius: 6px; font: 13px/1.5 ui-monospace, Consolas, monospace; overflow-x: auto; }
 
+  /* Phones and short windows. The hero flows instead of pinning, so its content can never slide under the header. */
+  @media (max-width: 700px), (max-height: 760px) {
+    .hero { height: auto; }
+    .hero .stage { position: relative; top: 0; height: auto; min-height: calc(100svh - 54px); padding: 48px 0 76px; }
+    .hero .copy { margin-top: 0; }
+    .fins { height: clamp(150px, 26vh, 240px); margin-top: 32px; }
+  }
+  @media (max-width: 700px) {
+    section { padding: 80px 0; }
+    .hello { padding: 96px 0 88px; }
+    .statement { padding: 4vh 0 12vh; }
+    .hero .cta { gap: 18px; flex-direction: column; }
+    /* Task Manager keeps only the columns the demo is about */
+    .tm .search, .tm .rail, .tm .tools, .tm .caps2 { display: none; }
+    .tm .title { height: 40px; }
+    .tm .inner { grid-template-columns: 1fr; min-height: 0; }
+    .tm .pane { border-radius: 0; padding-top: 12px; }
+    .tm .head { padding: 0 12px 10px; }
+    .tm table { min-width: 0; font-size: 12px; }
+    .tm th:nth-child(2), .tm td:nth-child(2), .tm th:nth-child(4), .tm td:nth-child(4) { display: none; }
+    .tm th, .tm td { padding-left: 6px; padding-right: 8px; }
+    .tm th:first-child, .tm td:first-child { padding-left: 12px; white-space: normal; }
+    .tm .grp td { padding-left: 12px; }
+    .tm .name { gap: 8px; }
+    .demo .toggle { flex: 1 1 140px; }
+    /* the chat button shrinks to its icon */
+    .chatbtn { padding: 8px; right: 14px; bottom: 14px; }
+    .chatbtn > span:last-child { display: none; }
+    .chat { right: 14px; bottom: 70px; }
+    /* research: one card per candidate, the figure scrolls at a legible size, code wraps */
+    .rtable { overflow: visible; }
+    .rtable table, .rtable tbody, .rtable tr, .rtable td { display: block; }
+    .rtable table { min-width: 0; }
+    .rtable thead { display: none; }
+    .rtable tr { border-top: 1px solid var(--rule); padding: 12px 0; }
+    .rtable tr.win { padding: 12px; background: #fff4e6; border-radius: 8px; border-top: 0; margin-top: 8px; }
+    .rtable td { border: 0; padding: 2px 0; }
+    .rtable tr.win td { background: none; }
+    .rtable td:empty { display: none; }
+    .rtable td:first-child { font-weight: 600; margin-bottom: 4px; }
+    .rtable td[data-label]::before { content: attr(data-label) ": "; color: var(--grey); }
+    .numline { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .numline svg { min-width: 640px; }
+    .codeblk pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .pubacts { flex-direction: column; align-items: flex-start; gap: 14px; }
+  }
+
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -550,7 +597,7 @@
         </details>
         <details name="diff" data-v="3">
           <summary>CPU and GPU, each on its own <span class="chev" aria-hidden="true"></span></summary>
-          <p>The processor and the graphics card yield separately, and in proportion. Fill the GPU with a scene and the CPU keeps you warm. Fill half the cores and Hotfix warms with the other half.</p>
+          <p>The processor and the graphics card yield separately, and in proportion. Fill the GPU with a scene and the CPU keeps you warm. Fill half the cores and Hotfix warms with most of the other half.</p>
         </details>
         <details name="diff" data-v="4">
           <summary>Nothing to sign in to <span class="chev" aria-hidden="true"></span></summary>
@@ -776,12 +823,12 @@
         <table>
           <thead><tr><th scope="col">Candidate</th><th scope="col">Settles on</th><th scope="col">Processor<sup><a href="#fn-9" id="r-9">9</a></sup></th><th scope="col">Graphics card</th><th scope="col">Verdict</th></tr></thead>
           <tbody>
-            <tr><td>Doing nothing</td><td>Nothing</td><td>Idle</td><td>Idle</td><td>Rejected. Cold.</td></tr>
-            <tr><td><code>x × 0.9999999 + 0.0000001</code><small>Hotfix 0.1.0, processor</small></td><td>0.58886087, after 9.3 million steps</td><td>121–122 W</td><td></td><td>Rejected. 0.58886087 is not nothing.</td></tr>
-            <tr><td>The same, eight chains summed<small>Hotfix 0.1.0, graphics card</small></td><td>Infinity, after 43 passes, about a seventh of a second</td><td></td><td>170–171 W</td><td>Rejected. Infinity is the opposite of nothing.</td></tr>
-            <tr class="dim"><td><code>x × 0 + 0</code></td><td>Zero</td><td colspan="2">Not built</td><td>Rejected. A shader compiler may delete it, and a multiplier given nothing to do does very little of it.</td></tr>
-            <tr class="dim"><td>Anything settling below 2<sup>−126</sup></td><td>A subnormal number</td><td colspan="2">Not built</td><td>Rejected. Processors slow down for subnormal numbers and graphics cards flush them to zero. Both make less heat.</td></tr>
-            <tr class="win"><td><i>x</i> × ½ + 2<sup>−126</sup><small>Hotfix 0.1.1</small></td><td>2<sup>−125</sup>, within about 150 steps</td><td>126–130 W</td><td>163–170 W</td><td>Selected.</td></tr>
+            <tr><td>Doing nothing</td><td data-label="Settles on">Nothing</td><td data-label="Processor">Idle</td><td data-label="Graphics card">Idle</td><td data-label="Verdict">Rejected. Cold.</td></tr>
+            <tr><td><code>x × 0.9999999 + 0.0000001</code><small>Hotfix 0.1.0, processor</small></td><td data-label="Settles on">0.58886087, after 9.3 million steps</td><td data-label="Processor">121–122 W</td><td data-label="Graphics card"></td><td data-label="Verdict">Rejected. 0.58886087 is not nothing.</td></tr>
+            <tr><td>The same, eight chains summed<small>Hotfix 0.1.0, graphics card</small></td><td data-label="Settles on">Infinity, after 43 passes, about a seventh of a second</td><td data-label="Processor"></td><td data-label="Graphics card">170–171 W</td><td data-label="Verdict">Rejected. Infinity is the opposite of nothing.</td></tr>
+            <tr class="dim"><td><code>x × 0 + 0</code></td><td data-label="Settles on">Zero</td><td colspan="2" data-label="Heat">Not built</td><td data-label="Verdict">Rejected. A shader compiler may delete it, and a multiplier given nothing to do does very little of it.</td></tr>
+            <tr class="dim"><td>Anything settling below 2<sup>−126</sup></td><td data-label="Settles on">A subnormal number</td><td colspan="2" data-label="Heat">Not built</td><td data-label="Verdict">Rejected. Processors slow down for subnormal numbers and graphics cards flush them to zero. Both make less heat.</td></tr>
+            <tr class="win"><td><i>x</i> × ½ + 2<sup>−126</sup><small>Hotfix 0.1.1</small></td><td data-label="Settles on">2<sup>−125</sup>, within about 150 steps</td><td data-label="Processor">126–130 W</td><td data-label="Graphics card">163–170 W</td><td data-label="Verdict">Selected.</td></tr>
           </tbody>
         </table>
         <figcaption>Table 1: Candidate calculations, their answers and their heat.</figcaption>
@@ -801,7 +848,7 @@
             <line x1="469" y1="70" x2="469" y2="76" stroke="#1b1b1b"/><text x="469" y="92">10⁻¹⁰</text>
             <line x1="588.1" y1="70" x2="588.1" y2="76" stroke="#1b1b1b"/><text x="588.1" y="92">1</text>
           </g>
-          <circle cx="20" cy="70" r="5" fill="#fff" stroke="#1b1b1b"/><text x="20" y="114" text-anchor="middle" fill="#1b1b1b">0, nothing</text>
+          <circle cx="20" cy="70" r="5" fill="#fff" stroke="#1b1b1b"/><text x="12" y="114" text-anchor="start" fill="#1b1b1b">0, nothing</text>
           <circle cx="139.7" cy="70" r="7" fill="#e8590c"/><text x="139.7" y="114" text-anchor="middle" fill="#1b1b1b" font-weight="600">Hotfix 0.1.1: 2⁻¹²⁵</text>
           <circle cx="585.3" cy="70" r="6" fill="#8a8a8a"/><text x="585.3" y="40" text-anchor="middle" fill="#1b1b1b">0.1.0, processor: 0.589</text>
           <circle cx="690" cy="70" r="6" fill="#8a8a8a"/><text x="690" y="114" text-anchor="end" fill="#1b1b1b">0.1.0, graphics card: ∞</text>
@@ -945,7 +992,7 @@
   </div>
 </footer>
 
-<button class="chatbtn" type="button" popovertarget="chat"><span class="av"><svg aria-hidden="true"><use href="#fins"/></svg></span><span>Cold?<small>Let's chat</small></span></button>
+<button class="chatbtn" type="button" popovertarget="chat" aria-label="Cold? Let's chat"><span class="av"><svg aria-hidden="true"><use href="#fins"/></svg></span><span>Cold?<small>Let's chat</small></span></button>
 <div class="chat" id="chat" popover role="dialog" aria-labelledby="chat-title">
   <header><span id="chat-title">Hotfix assistant</span><button type="button" popovertarget="chat" popovertargetaction="hide" aria-label="Close"><svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="m0 0 10 10M10 0 0 10" stroke="#fff"/></svg></button></header>
   <p class="msg">It looks like you're cold. Would you like help with that?</p>
@@ -1001,8 +1048,9 @@
 
   // Task Manager: the same rules as Hotfix's Heater.cs, on made-up load.
   const $ = (id) => document.getElementById(id);
-  const Quiet = { cpu: .10, gpu: 5 }, Busy = { cpu: .35, gpu: 40 }, Climb = .05;
-  const room = (others, k) => Math.max(0, Math.min(1, (Busy[k] - others) / (Busy[k] - Quiet[k])));
+  const Reserve = .1, Quiet = 5, Busy = 40, Climb = .05; // two of twenty logical processors; GPU thresholds in per cent
+  const clamp = (v) => Math.max(0, Math.min(1, v));
+  const room = (others, k) => k === "cpu" ? clamp((1 - others - Reserve) / (1 - Reserve)) : clamp((Busy - others) / (Busy - Quiet));
   const follow = (heat, target) => target < heat ? target : Math.min(target, heat + Climb);
   const state = { build: false, scene: false, cpu: 1, gpu: 1, buildMem: 0 };
   const jitter = (v, a) => Math.max(0, v + (Math.random() - .5) * a);

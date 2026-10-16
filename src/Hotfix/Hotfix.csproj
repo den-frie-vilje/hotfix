@@ -9,7 +9,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>hotfix.ico</ApplicationIcon>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Product>Hotfix</Product>
     <Company>Den Frie Vilje ApS</Company>
     <Copyright>© 2026 Den Frie Vilje ApS</Copyright>
